@@ -1,21 +1,8 @@
 import express from "express";
 import dotenvFlow from "dotenv-flow";
-import path from "path";
-import { fileURLToPath } from "url";
+import { loadEnv } from "../loadEnv.js";
 
-  // Recreate __dirname in ESM
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-
-  // Load global .env first (services/.env)
-  dotenvFlow.config({
-    path: path.resolve(__dirname, "../") // points to services/
-  });
-
-  // Load service-specific .env (auth-service, product-service, payment-service)
-  dotenvFlow.config({
-    path: path.resolve(__dirname, ".") // points to current service folder
-  });
+loadEnv(import.meta.url, dotenvFlow);
 
 const app = express();
 const port = process.env.PORT;
