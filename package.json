@@ -1,0 +1,16 @@
+{
+  "name": "yarnify-online-ordering-system",
+  "version": "1.0.0",
+  "description": "Yarnify is an Online Ordering System where user can Order Crochet and Knitting Tools and Supplies",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:all": "concurrently \"cd frontend && npm run dev\" \"cd services/auth-service && npm start\" \"cd services/product-service && npm start\" \"cd services/payment-service && npm start\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
