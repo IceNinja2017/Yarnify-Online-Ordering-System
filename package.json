@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:all": "concurrently \"cd frontend && npm run dev\" \"cd services/auth-service && npm start\" \"cd services/product-service && npm start\" \"cd services/payment-service && npm start\""
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
