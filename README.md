@@ -74,24 +74,36 @@ This project is split into feature branches for each service:
 Before pushing new changes, always update your branch with the latest code from main.  
 
 1. Make sure you are on your service branch (example: auth-service):  
+```bash
    git checkout auth-service  
+```
 
 2. Fetch the latest changes:  
+```bash
    git fetch origin  
+```
 
 3. Merge main into your branch:  
+```bash
    git merge origin/main  
+```
 
    If there are merge conflicts, resolve them in your code editor, then run:  
+```bash
    git add .  
    git commit  
+```
 
-4. Push the updated branch to GitHub:  
+4. Push the updated branch to GitHub:
+```bash  
    git push origin auth-service  
+```
 
 ---
 
 Tip: Always pull updates before starting work to avoid large conflicts.  
 If you want a clean history, you can use:  
+```bash
    git rebase origin/main  
+```
 instead of merge (advanced).
