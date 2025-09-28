@@ -7,10 +7,10 @@ import mongoose from "mongoose";
 loadEnv(import.meta.url, dotenvFlow);
 
 const app = express();
-const port = process.env.PORT;
-const service_name = process.env.SERVICE_NAME;
+const PORT = process.env.PORT;
+const SERVICE_NAME = process.env.SERVICE_NAME;
 
-app.listen(5002, () =>{
+app.listen(PORT, () =>{
     connectDB(mongoose);
-    console.log(service_name + " Server started at http://localhost:" + port);
+    console.log(SERVICE_NAME + " Server started at http://localhost:" + PORT);
 });

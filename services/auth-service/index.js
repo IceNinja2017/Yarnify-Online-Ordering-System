@@ -3,18 +3,17 @@ import dotenvFlow from "dotenv-flow";
 import { loadEnv } from "../config/loadEnv.js";
 import { connectDB } from "../config/db.js";
 import mongoose, { get } from "mongoose";
+import authRoutes from "./routes/auth.route.js"
 
 loadEnv(import.meta.url, dotenvFlow);
 
 const app = express();
-const port = process.env.PORT;
-const service_name = process.env.SERVICE_NAME;
+const PORT = process.env.PORT;
+const SERVICE_NAME = process.env.SERVICE_NAME;
 
-app.listen(5000, () =>{
+app.listen(PORT, () =>{
     connectDB(mongoose);
-    console.log(service_name + " Server started at http://localhost:" + port);
+    console.log(SERVICE_NAME + " Server started at http://localhost:" + PORT);
 });
 
-app.get("/", (req, res) => {
-    res.send("Hi, eads hhh");
-});
+app.use("/api/auth", authRoutes);
