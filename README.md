@@ -59,3 +59,39 @@ Each service (`auth-service`, `payment-service`, `product-service`) also has its
 
 ⚠️ **Note:** For security reasons, `.env` files are **not included** in this repository.  
 👉 Please contact the repository owner to obtain the required `.env` files.
+
+---
+
+## 🌱 Working with Branches  
+
+This project is split into feature branches for each service:  
+- auth-service  
+- product-service  
+- payment-service  
+
+### 🔄 Keeping Your Branch Up-to-Date with main
+
+Before pushing new changes, always update your branch with the latest code from main.  
+
+1. Make sure you are on your service branch (example: auth-service):  
+   git checkout auth-service  
+
+2. Fetch the latest changes:  
+   git fetch origin  
+
+3. Merge main into your branch:  
+   git merge origin/main  
+
+   If there are merge conflicts, resolve them in your code editor, then run:  
+   git add .  
+   git commit  
+
+4. Push the updated branch to GitHub:  
+   git push origin auth-service  
+
+---
+
+Tip: Always pull updates before starting work to avoid large conflicts.  
+If you want a clean history, you can use:  
+   git rebase origin/main  
+instead of merge (advanced).
