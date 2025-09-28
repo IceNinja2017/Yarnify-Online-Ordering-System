@@ -2,7 +2,7 @@ import express from "express";
 import dotenvFlow from "dotenv-flow";
 import { loadEnv } from "../config/loadEnv.js";
 import { connectDB } from "../config/db.js";
-import mongoose from "mongoose";
+import mongoose, { get } from "mongoose";
 
 loadEnv(import.meta.url, dotenvFlow);
 
@@ -13,4 +13,8 @@ const service_name = process.env.SERVICE_NAME;
 app.listen(5000, () =>{
     connectDB(mongoose);
     console.log(service_name + " Server started at http://localhost:" + port);
+});
+
+app.get("/", (req, res) => {
+    res.send("Hi, eads hhh");
 });
