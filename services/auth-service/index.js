@@ -16,4 +16,5 @@ app.listen(PORT, () =>{
     console.log(SERVICE_NAME + " Server started at http://localhost:" + PORT);
 });
 
+app.use(express.json()); // parse incoming JSON request
 app.use("/api/auth", authRoutes);

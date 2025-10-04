@@ -5,11 +5,11 @@ import { authenticate } from "../middleware/authorize.js";
 
 const router = express.Router();
 
-router.get("/register", register);
+router.post("/register", register);
 
-router.get("/login", login);
+router.post("/login", login);
 
-router.get("/logout", logout);
+router.post("/logout", logout);
 
 router.get("/me", authenticate, me);
 
