@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
+import { sendVerificationEmain } from "../mailtrap/emails.js";
 
 
 export const register = async (req, res) => {
@@ -37,7 +38,7 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create verification token (for email verification flow)
-        const verificationToken = crypto.randomBytes(32).toString("hex");
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); //crypto.randomBytes(32).toString("hex");
         const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
         const newUser = new User({
@@ -59,6 +60,7 @@ export const register = async (req, res) => {
 
         //jwt token
         generateTokenAndSetCookie(res, newUser._id);
+        await sendVerificationEmain(newUser.email, newUser.verificationToken);
 
         // TODO: send verification email. Replace with your mailer.
         // sendVerificationEmail(newUser.email, verificationToken);
