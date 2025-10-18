@@ -1,5 +1,5 @@
 import express from "express";
-import {login, logout, register} from "../controllers/auth.contoller.js"
+import {login, logout, register, verifyEmail} from "../controllers/auth.contoller.js"
 import { me, validateToken } from "../controllers/verification.controller.js";
 import { authenticate } from "../middleware/authorize.js";
 
@@ -10,6 +10,8 @@ router.post("/register", register);
 router.post("/login", login);
 
 router.post("/logout", logout);
+
+router.post("/verify-email", verifyEmail)
 
 router.get("/me", authenticate, me);
 
