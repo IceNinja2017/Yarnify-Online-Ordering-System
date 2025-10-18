@@ -125,6 +125,7 @@ export const verifyEmail = async (req, res) => {
             }
         });
     } catch (error) {
-        
+        console.error("Error in verifying Email:", err);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
