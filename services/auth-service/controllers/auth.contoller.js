@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
-import { sendVerificationEmain } from "../mailtrap/emails.js";
+import { sendVerificationEmain, sendWelcomeEmail } from "../mailtrap/emails.js";
 
 
 export const register = async (req, res) => {
@@ -98,5 +98,33 @@ export const logout = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
+    const { code } = req.body;
+    try {
+        const user = await User.findOne( {
+            verificationToken: code,
+            verificationTokenExpiresAt: { $gt: Date.now() }
+        });
 
+        if(!user) {
+            return res.status(400).json({ success: false, message: "Invalid or Expired Verification Code" });
+        }
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpiresAt = undefined;
+
+        await user.save();
+
+        await sendWelcomeEmail(user.email, user.username);
+        res.status(200).json({
+            success: true,
+            message: "Email verified sucessfully",
+            user: {
+                ...user._doc,
+                password: undefined
+            }
+        });
+    } catch (error) {
+        
+    }
 };
