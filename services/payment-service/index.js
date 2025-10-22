@@ -1,12 +1,12 @@
-import express from "express";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
 import cors from "cors";
+import express from "express";
+import dotenvFlow from "dotenv-flow";
+import { loadEnv } from "../config/loadEnv.js";
+import { connectDB } from "../config/db.js";
+import mongoose from "mongoose";
 import paymentRoutes from "./routes/payment.route.js";
 
 dotenv.config();
-
-const app = express();
 
 app.use(cors());
 app.use(express.json());
@@ -14,13 +14,13 @@ app.use(express.json());
 // ROUTES
 app.use("/api/payment", paymentRoutes);
 
-const PORT = process.env.PORT || 5001;
+loadEnv(import.meta.url, dotenvFlow);
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Payment Service running at http://localhost:${PORT}`);
-    });
-    console.log("MongoDB Connected");
-  })
-  .catch(err => console.log(err));
+const app = express();
+const PORT = process.env.PORT;
+const SERVICE_NAME = process.env.SERVICE_NAME;
+
+app.listen(PORT, () =>{
+    connectDB(mongoose);
+    console.log(SERVICE_NAME + " Server started at http://localhost:" + PORT);
+});
