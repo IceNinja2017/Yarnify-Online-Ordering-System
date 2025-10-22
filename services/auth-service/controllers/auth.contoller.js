@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
+import { sendVerificationEmain, sendWelcomeEmail } from "../mailtrap/emails.js";
 
 
 export const register = async (req, res) => {
@@ -37,7 +38,7 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create verification token (for email verification flow)
-        const verificationToken = crypto.randomBytes(32).toString("hex");
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); //crypto.randomBytes(32).toString("hex");
         const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
         const newUser = new User({
@@ -59,6 +60,7 @@ export const register = async (req, res) => {
 
         //jwt token
         generateTokenAndSetCookie(res, newUser._id);
+        await sendVerificationEmain(newUser.email, newUser.verificationToken);
 
         // TODO: send verification email. Replace with your mailer.
         // sendVerificationEmail(newUser.email, verificationToken);
@@ -88,9 +90,85 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-    res.send("login route");
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if(!user){
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Credentials"
+            });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid){
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Credentials"
+            });
+        }
+
+        generateTokenAndSetCookie(res, user._id);
+
+        user.lastLogin = new Date();
+        await user.save();
+
+        res.status(200).json({
+                success: true,
+                message: "Logged in Sucessfully",
+                user: {
+                    ...user._doc,
+                    password: undefined,
+                },
+            });
+
+    } catch (error) {
+        console.log("Error in logging in", error);
+        res.status(400).json({
+                success: false,
+                message: error.message
+            });
+    }
 };
 
 export const logout = async (req, res) => {
-    res.send("logout route");
+    res.clearCookie("token");
+    res.status(200).json({
+            success: true,
+            message: "Logged out sucessfully"
+        });
+};
+
+export const verifyEmail = async (req, res) => {
+    const { code } = req.body;
+    try {
+        const user = await User.findOne( {
+            verificationToken: code,
+            verificationTokenExpiresAt: { $gt: Date.now() }
+        });
+
+        if(!user) {
+            return res.status(400).json({ success: false, message: "Invalid or Expired Verification Code" });
+        }
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpiresAt = undefined;
+
+        await user.save();
+
+        await sendWelcomeEmail(user.email, user.username);
+        res.status(200).json({
+            success: true,
+            message: "Email verified sucessfully",
+            user: {
+                ...user._doc,
+                password: undefined
+            }
+        });
+    } catch (error) {
+        console.error("Error in verifying Email:", err);
+        return res.status(500).json({ message: "Internal server error" });
+    }
 };

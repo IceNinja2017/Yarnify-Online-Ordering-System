@@ -1,22 +1,26 @@
 import express from "express";
-import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../config/loadEnv.js";
-import { connectDB } from "../config/db.js";
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
 import paymentRoutes from "./routes/payment.route.js";
 
-loadEnv(import.meta.url, dotenvFlow);
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 8082;
-const SERVICE_NAME = process.env.SERVICE_NAME || "Payment-Service";
 
-app.use(express.json()); // Enable reading JSON
+app.use(cors());
+app.use(express.json());
 
-app.listen(PORT, () => {
-    connectDB(mongoose); // Connect to DB
-    console.log(`${SERVICE_NAME} Server running at http://localhost:${PORT}`);
-});
-
-// Use payment routes for paths starting with /api/payment
+// ROUTES
 app.use("/api/payment", paymentRoutes);
+
+const PORT = process.env.PORT || 5001;
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Payment Service running at http://localhost:${PORT}`);
+    });
+    console.log("MongoDB Connected");
+  })
+  .catch(err => console.log(err));
