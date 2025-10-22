@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema({
         postalCode: { type: String },
         country: { type: String, required: true }
     },
-    transactionId: { type: String } // For simulated PayPal ID
+    transactionId: { type: String } 
 }, { timestamps: true });
 
 export const Order = mongoose.model('Order', orderSchema);
