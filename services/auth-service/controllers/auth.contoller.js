@@ -120,6 +120,10 @@ export const login = async (req, res) => {
                 user: {
                     ...user._doc,
                     password: undefined,
+                    passwordResetToken: undefined,
+                    passwordResetExpiresAt: undefined,
+                    verificationToken: undefined,
+                    verificationTokenExpiresAt: undefined,
                 },
             });
 
@@ -164,7 +168,11 @@ export const verifyEmail = async (req, res) => {
             message: "Email verified sucessfully",
             user: {
                 ...user._doc,
-                password: undefined
+                password: undefined,
+                passwordResetToken: undefined,
+                passwordResetExpiresAt: undefined,
+                verificationToken: undefined,
+                verificationTokenExpiresAt: undefined,
             }
         });
     } catch (error) {
@@ -191,6 +199,10 @@ export const getUserById = async (req, res) => {
             user: {
                 ...user._doc,
                 password: undefined,
+                passwordResetToken: undefined,
+                passwordResetExpiresAt: undefined,
+                verificationToken: undefined,
+                verificationTokenExpiresAt: undefined,
             },
         });
     } catch (error) {
