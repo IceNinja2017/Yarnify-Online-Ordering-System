@@ -1,37 +1,22 @@
 import express from "express";
-import Cart from "../models/Cart.js";
+import { verifyToken } from "../middleware/auth.js";
+import { getUserOrder, updatedOrderById } from "../controllers/order.controller.js"
+import { newOrderCOD, addToCart, createNewCart } from "../controllers/cart.controller.js"
 
 const router = express.Router();
 
+//add to cart
+router.post("/add-to-cart", addToCart);
 
-router.post("/cart", async (req, res) => {
-  try {
-    const { userId, items } = req.body;
+//add new cod Order
+router.post("/cod", verifyToken, newOrderCOD);
 
-    
-    let cart = await Cart.findOne({ userId });
+//get order from user id
+router.get("/orders/:userId", getUserOrder);
 
-    if (!cart) {
-      cart = new Cart({ userId, items, totalAmount: 0 });
-    } else {
-      cart.items = items; 
-    }
+// Update order status (Admin)
+router.put("/update/:orderId", updatedOrderById);
 
-    
-    cart.totalAmount = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-
-    await cart.save();
-
-    res.status(200).json({
-      message: "Item(s) added to cart successfully",
-      cart,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+router.post("/create-new-cart/:userId", createNewCart);
 
 export default router;
