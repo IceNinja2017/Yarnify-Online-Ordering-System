@@ -6,19 +6,17 @@ import { connectDB } from "../config/db.js";
 import mongoose from "mongoose";
 import paymentRoutes from "./routes/payment.route.js";
 
-dotenv.config();
+loadEnv(import.meta.url, dotenvFlow);
+
+const app = express();
+const PORT = process.env.PORT;
+const SERVICE_NAME = process.env.SERVICE_NAME;
 
 app.use(cors());
 app.use(express.json());
 
 // ROUTES
 app.use("/api/payment", paymentRoutes);
-
-loadEnv(import.meta.url, dotenvFlow);
-
-const app = express();
-const PORT = process.env.PORT;
-const SERVICE_NAME = process.env.SERVICE_NAME;
 
 app.listen(PORT, () =>{
     connectDB(mongoose);
