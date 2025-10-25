@@ -102,7 +102,7 @@ export const getCartByUserId = async (req, res) => {
 }
 
 //clear cart after order is placed
-export const clearCart = async (req, res) => {
+export const clearCartByUserId = async (req, res) => {
     try {
         const userId = req.params.userId;   
         await Cart.deleteOne({ userId: userId });
