@@ -1,9 +1,19 @@
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
 import { sendVerificationEmain, sendWelcomeEmail } from "../mailtrap/emails.js";
+import axios from "axios";
 
+import dotenvFlow from "dotenv-flow";
+import { loadEnv } from "../../config/loadEnv.js";
+import { fileURLToPath, pathToFileURL } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
+
+loadEnv(envFileURL, dotenvFlow);
 
 export const register = async (req, res) => {
     try {
@@ -72,6 +82,13 @@ export const register = async (req, res) => {
         delete userObj.verificationTokenExpiresAt;
         delete userObj.resetPasswordToken;
         delete userObj.resetPasswordExpiresAt;
+
+        try {
+            const paymentRes = await axios.post(`http://localhost:${process.env.PaymentService_PORT || 5001}/api/payment/create-new-cart/${newUser._id}`);
+            console.log(`Payment service responded with status: ${paymentRes.status}`);
+        } catch (error) {
+            console.error("Error communicating with Payment service:", err.message);
+        }
 
         return res.status(201).json({
             sucess: true,
