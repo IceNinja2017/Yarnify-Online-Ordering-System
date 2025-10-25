@@ -83,8 +83,10 @@ export const register = async (req, res) => {
         delete userObj.resetPasswordToken;
         delete userObj.resetPasswordExpiresAt;
 
+        const PaymentService_PORT = process.env.PaymentService_PORT || 6000;
+        // Communicate with Payment service to create a cart for the new user
         try {
-            const paymentRes = await axios.post(`http://localhost:${process.env.PaymentService_PORT || 5001}/api/payment/create-new-cart/${newUser._id}`);
+            const paymentRes = await axios.post(`http://localhost:${PaymentService_PORT}/api/payment/create-new-cart/${newUser._id}`);
             console.log(`Payment service responded with status: ${paymentRes.status}`);
         } catch (error) {
             console.error("Error communicating with Payment service:", err.message);
