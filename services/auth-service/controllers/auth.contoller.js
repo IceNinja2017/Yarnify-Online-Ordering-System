@@ -83,15 +83,6 @@ export const register = async (req, res) => {
         delete userObj.resetPasswordToken;
         delete userObj.resetPasswordExpiresAt;
 
-        const PaymentService_PORT = process.env.PaymentService_PORT || 6000;
-        // Communicate with Payment service to create a cart for the new user
-        try {
-            const paymentRes = await axios.post(`http://localhost:${PaymentService_PORT}/api/payment/create-new-cart/${newUser._id}`);
-            console.log(`Payment service responded with status: ${paymentRes.status}`);
-        } catch (error) {
-            console.error("Error communicating with Payment service:", err.message);
-        }
-
         return res.status(201).json({
             sucess: true,
             message: "Registration successful. Check your email to verify your account.",
@@ -182,6 +173,16 @@ export const verifyEmail = async (req, res) => {
         await user.save();
 
         await sendWelcomeEmail(user.email, user.username);
+
+        const PaymentService_PORT = process.env.PaymentService_PORT || 6000;
+        // Communicate with Payment service to create a cart for the new user
+        try {
+            const paymentRes = await axios.post(`http://localhost:${PaymentService_PORT}/api/payment/create-new-cart/${newUser._id}`);
+            console.log(`Payment service responded with status: ${paymentRes.status}`);
+        } catch (error) {
+            console.error("Error communicating with Payment service:", err.message);
+        }
+
         res.status(200).json({
             success: true,
             message: "Email verified sucessfully",
