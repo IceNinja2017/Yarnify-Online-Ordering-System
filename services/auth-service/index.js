@@ -8,7 +8,7 @@ import authRoutes from "./routes/auth.route.js"
 loadEnv(import.meta.url, dotenvFlow);
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.AuthenticationService_PORT || 5000;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
 app.listen(PORT, () =>{
