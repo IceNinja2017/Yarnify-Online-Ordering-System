@@ -2,8 +2,19 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
-import { sendVerificationEmain, sendWelcomeEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmain, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from "../mailtrap/emails.js";
+import axios from "axios";
 
+import dotenvFlow from "dotenv-flow";
+import { loadEnv } from "../../config/loadEnv.js";
+import { fileURLToPath, pathToFileURL } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
+
+loadEnv(envFileURL, dotenvFlow);
 
 export const register = async (req, res) => {
     try {
@@ -120,6 +131,10 @@ export const login = async (req, res) => {
                 user: {
                     ...user._doc,
                     password: undefined,
+                    passwordResetToken: undefined,
+                    passwordResetExpiresAt: undefined,
+                    verificationToken: undefined,
+                    verificationTokenExpiresAt: undefined,
                 },
             });
 
@@ -159,12 +174,26 @@ export const verifyEmail = async (req, res) => {
         await user.save();
 
         await sendWelcomeEmail(user.email, user.username);
+
+        const PaymentService_PORT = process.env.PaymentService_PORT || 6000;
+        // Communicate with Payment service to create a cart for the new user
+        try {
+            const paymentRes = await axios.post(`http://localhost:${PaymentService_PORT}/api/payment/create-new-cart/${user._id}`);
+            console.log(`Payment service responded with status: ${paymentRes.status}`);
+        } catch (error) {
+            console.error("Error communicating with Payment service:", err.message);
+        }
+
         res.status(200).json({
             success: true,
             message: "Email verified sucessfully",
             user: {
                 ...user._doc,
-                password: undefined
+                password: undefined,
+                passwordResetToken: undefined,
+                passwordResetExpiresAt: undefined,
+                verificationToken: undefined,
+                verificationTokenExpiresAt: undefined,
             }
         });
     } catch (error) {
@@ -191,6 +220,10 @@ export const getUserById = async (req, res) => {
             user: {
                 ...user._doc,
                 password: undefined,
+                passwordResetToken: undefined,
+                passwordResetExpiresAt: undefined,
+                verificationToken: undefined,
+                verificationTokenExpiresAt: undefined,
             },
         });
     } catch (error) {
@@ -198,5 +231,93 @@ export const getUserById = async (req, res) => {
             success: true,
             message: error.message,
         });
+    }
+}
+
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if(!user) {
+            return res.status(400).json({ success: false, message: "User with this email does not exist" });
+        }
+        // Generate reset token
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        const resetTokenExpiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiresAt;
+        await user.save();  
+
+        //send reset password email
+        const resetUrl = `${process.env.FRONTEND_BASE_URL}/reset-password/${resetToken}`;
+        
+        await sendResetPasswordEmail(user.email, resetUrl);
+
+        res.status(200).json({
+            success: true,
+            message: "Password reset email sent. Please check your inbox."
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    try {
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpiresAt: { $gt: Date.now() }
+        });
+
+        if(!user) {
+            return res.status(400).json({ success: false, message: "Invalid or Expired Password Reset Token" });
+        }
+
+        //update password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user.password = hashedPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+        await user.save();
+
+        //send reset confirmation email
+        await sendResetSuccessEmail(user.email);
+
+        res.status(200).json({
+            success: true,
+            message: "Password reset successful. You can now log in with your new password."
+        });
+    } catch (error) {
+        console.error("Error in resetting password:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const checkAuth = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+        if(!user) {
+            return res.status(401).json({ success: false, message: "User not found" });
+        }
+        res.status(200).json({
+            success: true,
+            message: "User is authenticated",
+            user: {
+                ...user._doc,
+                password: undefined,
+                passwordResetToken: undefined,
+                passwordResetExpiresAt: undefined,
+                verificationToken: undefined,
+                verificationTokenExpiresAt: undefined,
+            }
+        });
+    } catch (error) {
+        console.error("Error in checking authentication:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
