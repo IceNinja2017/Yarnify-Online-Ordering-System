@@ -45,7 +45,7 @@ export const newOrderCOD = async (req, res) => {
 }
 
 //newOrderPaypal
-newOrderPaypal = async (req, res) => {
+export const newOrderPaypal = async (req, res) => {
   try {
     const { userId, paymentDetails } = req.body;
     const cart = await Cart.findOne({ userId: userId });
@@ -65,12 +65,16 @@ newOrderPaypal = async (req, res) => {
     await newOrder.save();
     await Cart.deleteOne({ userId: userId });
 
-//getOrderById
+
     res.status(200).json({ message: "Order placed (PayPal)", order: newOrder });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }
+
+//getOrderById
+//code diri
+
 
 //getAllOrders
 export const getAllOrders = async (req, res) => {
