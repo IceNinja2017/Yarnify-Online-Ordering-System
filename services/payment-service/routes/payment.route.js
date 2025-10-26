@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyToken } from "../middleware/auth.js";
-import { getUserOrders, updatedOrderById, newOrderCOD} from "../controllers/order.controller.js"
-import { addToCart, createNewCart, removeItemFromCart, updateItemQuantityInCart, getCartByUserId,  clearCartByUserId } from "../controllers/cart.controller.js"
+import { getUserOrders, updatedOrderById, newOrderCOD, newOrderPaypal, getAllOrders, getOrderById, getOrdersByStatus, } from "../controllers/order.controller.js"
+import { addToCart, createNewCart, removeItemFromCart, updateItemQuantityInCart, getCartByUserId,  clearCartByUserId, } from "../controllers/cart.controller.js"
 
 const router = express.Router();
 
@@ -26,5 +26,13 @@ router.put("/update-item-quantity/:userId/:itemId", updateItemQuantityInCart);
 router.get("/cart/:userId", getCartByUserId);
 //clear cart after order is placed
 router.delete("/clear-cart/:userId", clearCartByUserId);
+//get all orders (Admin)
+router.get("/all-orders", getAllOrders);
+//get order by id (Admin)
+router.get("/order/:orderId", getOrderById);
+//get orders by status (Admin)
+router.get("/orders/status/:status", getOrdersByStatus);
+//add new paypal Order
+router.post("/paypal", verifyToken, newOrderPaypal);
 
 export default router;
