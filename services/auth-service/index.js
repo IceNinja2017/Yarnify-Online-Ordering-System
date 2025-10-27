@@ -1,5 +1,6 @@
 import express from "express";
 import dotenvFlow from "dotenv-flow";
+import cookieParser from "cookie-parser";
 import { loadEnv } from "../config/loadEnv.js";
 import { connectDB } from "../config/db.js";
 import mongoose, { get } from "mongoose";
@@ -17,4 +18,5 @@ app.listen(PORT, () =>{
 });
 
 app.use(express.json()); // parse incoming JSON request
+app.use(cookieParser()); // parse cookies
 app.use("/api/auth", authRoutes);
