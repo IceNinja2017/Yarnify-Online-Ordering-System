@@ -37,7 +37,6 @@ export const newOrderCOD = async (req, res) => {
     });
     await newOrder.save();
     await Cart.deleteOne({ userId: userId });
-
     res.status(200).json({ message: "Order placed (COD)", order: newOrder });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -72,10 +71,6 @@ export const newOrderPaypal = async (req, res) => {
   }
 }
 
-//getOrderById
-//code diri
-
-
 //getAllOrders
 export const getAllOrders = async (req, res) => {
   try {
@@ -85,6 +80,7 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ message: error.message });
   } 
 }
+
 //getOrderById
 export const getOrderById = async (req, res) => {
   try {
@@ -106,4 +102,6 @@ export const getOrdersByStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
     }
 }
+
+
 
