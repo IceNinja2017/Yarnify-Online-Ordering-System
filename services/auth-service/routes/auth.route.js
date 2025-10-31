@@ -1,9 +1,12 @@
 import express from "express";
-import {login, logout, register} from "../controllers/auth.contoller.js"
-import { me, validateToken } from "../controllers/verification.controller.js";
-import { authenticate } from "../middleware/authorize.js";
+import { getUserById, login, logout, register, verifyEmail, forgotPassword, resetPassword, checkAuth } from "../controllers/auth.contoller.js"
+import { validateToken } from "../middleware/authorize.js";
 
 const router = express.Router();
+
+router.get("/check-auth",validateToken, checkAuth)
+
+router.get("/:userId", getUserById);
 
 router.post("/register", register);
 
@@ -11,8 +14,10 @@ router.post("/login", login);
 
 router.post("/logout", logout);
 
-router.get("/me", authenticate, me);
+router.post("/verify-email", verifyEmail);
 
-router.get("/validate-token", authenticate, validateToken)
+router.post("/forgot-password", forgotPassword);
+
+router.post("/reset-password/:token", resetPassword);
 
 export default router;

@@ -31,6 +31,7 @@ export const createPayPalOrder = async (req, res) => {
 //capturePayPalOrder
 export const capturePayPalOrder = async (req, res) => {
   const { orderID } = req.body;
+
   const request = new paypal.orders.OrdersCaptureRequest(orderID);
   request.requestBody({});
 
