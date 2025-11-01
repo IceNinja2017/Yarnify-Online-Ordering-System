@@ -18,7 +18,7 @@ function App() {
           backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
         }}
         transition={{
-          duration: 15,
+          duration: 5,
           ease: "easeInOut",
           repeat: Infinity,
         }}
