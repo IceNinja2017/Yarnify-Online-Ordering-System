@@ -1,4 +1,5 @@
-import { MailtrapClient } from "mailtrap";
+import nodemailer from "nodemailer";
+
 import dotenvFlow from "dotenv-flow";
 import { loadEnv } from "../../config/loadEnv.js";
 import { fileURLToPath, pathToFileURL } from "url";
@@ -10,15 +11,15 @@ const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
 
 loadEnv(envFileURL, dotenvFlow);
 
-const TOKEN = process.env.MAILTRAP_TOKEN;
-const ENDPOINT = process.env.MAILTRAP_ENDPOINT;
+const GmailUser = process.env.GMAIL_USER
+const GmailPass = process.env.GMAIL_PASS
 
-export const mailtrapClient = new MailtrapClient({
-  token: TOKEN,
-  endpoint: ENDPOINT
+export const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: GmailUser,
+        pass: GmailPass
+    }
 });
 
-export const sender = {
-  email: "mailtrap@demomailtrap.com",
-  name: "Yarnify.com.ph",
-};
+export const sender = `"Yarnify" <${GmailUser}>`;
