@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
-import { sendVerificationEmain, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmain, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from "../gmail/emails.js";
 import axios from "axios";
 
 import dotenvFlow from "dotenv-flow";
