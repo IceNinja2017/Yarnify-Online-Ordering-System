@@ -1,6 +1,19 @@
 import Cart from "../models/Cart.js";
 import axios from "axios";
 
+import dotenvFlow from "dotenv-flow";
+import { loadEnv } from "../../config/loadEnv.js";
+import { fileURLToPath, pathToFileURL } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
+
+loadEnv(envFileURL, dotenvFlow);
+
+const AuthPort = process.env.AuthenticationService_PORT
+
 export const addToCart = async (req, res) => {
   try {
     const { userId, item } = req.body;
@@ -22,7 +35,9 @@ export const addToCart = async (req, res) => {
 export const createNewCart = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const response = await axios.get(`http://localhost:5000/api/auth/${userId}`);
+        console.log('AuthPort =', AuthPort);
+        const response = await axios.get(`http://localhost:${AuthPort}/api/auth/${userId}`);
+        console.log(AuthPort)
         if(response.data.success === false){
             return res.status(404).json({ message: "User not found" });
         }
