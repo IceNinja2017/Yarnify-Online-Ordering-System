@@ -1,5 +1,5 @@
 import e from "express";
-import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE } from "./emailTemplates.js";
+import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, WELCOME_EMAIL_TEMPLATE } from "./emailTemplates.js";
 import { transporter, sender } from "./gmail.config.js";
 
 export const sendVerificationEmain = async (email, verificationToken) => {
@@ -24,10 +24,7 @@ export const sendWelcomeEmail = async (email, username) => {
             from: sender,
             to: email,
             subject: "Welcome to Yarnify!",
-            html: `
-                <h1>Welcome to Yarnify, ${username}!</h1>
-                <p>We’re thrilled to have you on board.</p>
-            `
+            html: WELCOME_EMAIL_TEMPLATE.replace("{username}", username)
         });
 
         console.log("Welcome Email sent:", info.messageId);

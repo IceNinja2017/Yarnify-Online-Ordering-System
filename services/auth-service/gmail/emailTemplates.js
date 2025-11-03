@@ -93,3 +93,74 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
 </body>
 </html>
 `;
+
+
+export const WELCOME_EMAIL_TEMPLATE = `
+Put your HTML text here<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Welcome Email</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fffafb;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    background-color: #fffbff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #ebd8d0;
+  }
+  h1 {
+    color: #d3ab9e;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  h2 {
+    color: #d3ab9e;
+    font-size: 22px;
+  }
+  p {
+    color: #333;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 24px;
+    background-color: #d3ab9e;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  img {
+    width: 100%;
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Yarnify</h1>
+    <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?w=800" alt="Yarn shop" />
+    <h2>Welcome, {username}!</h2>
+    <p>
+      Thanks for choosing <strong>Yarnify</strong>!<br />
+      We are happy to see you on board.
+    </p>
+    <p>To get started, do this next step:</p>
+    <a href="{next_step_link}" class="button">Next Step</a>
+  </div>
+</body>
+</html>
+`
