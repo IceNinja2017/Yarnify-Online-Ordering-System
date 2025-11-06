@@ -27,9 +27,15 @@ export const addProduct = async (req, res) => {
         //delete temporary local file if any cloudinary upload is done
 
         await newProduct.save();
-        res.status(201).json({ message: "Product added successfully", product: newProduct });
+        res.status(201).json({
+            success: true,
+            message: "Product added successfully", 
+            product: newProduct });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: error.message 
+        });
     }
 };
 
@@ -40,7 +46,10 @@ export const getProductById = async (req, res) => {
         const product = await Product.findById(id);
 
         if (!product) {
-            return res.status(404).json({ message: "Product not found" });
+            return res.status(404).json({
+                    success: false,
+                    message: "Product not found" 
+                });
         }
         res.status(200).json({
             success: true, 
@@ -48,7 +57,10 @@ export const getProductById = async (req, res) => {
             product
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ 
+            success: false,    
+            message: error.message
+        });
     }
 }
 
@@ -61,7 +73,10 @@ export const getAllProducts = async (req, res) => {
             products
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: error.message
+         });
     }
 }
 
@@ -71,7 +86,10 @@ export const getProductsByCategory = async (req, res) => {
         const products = await Product.find({ category: category });
 
         if (products.length === 0) {
-            return res.status(404).json({ message: "No products found in this category" });
+            return res.status(404).json({
+                success: false,
+                message: "No products found in this category" 
+            });
         }       
         res.status(200).json({
             success: true,
@@ -79,7 +97,10 @@ export const getProductsByCategory = async (req, res) => {
             products
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({
+            success: false,
+            message: error.message
+         });
     }   
 }
 
