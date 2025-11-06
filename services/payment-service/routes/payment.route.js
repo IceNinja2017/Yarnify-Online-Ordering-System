@@ -16,6 +16,7 @@ router.post("/cod",validateToken, newOrderCOD);
 //get order from user id
 router.get("/orders", getAllOrders);
 
+//get orders by status (Admin)
 router.get("/order-status/:status", getOrdersByStatus);
 
 //get all orders (Admin)
@@ -26,10 +27,13 @@ router.put("/update/:orderId", updatedOrderById);
 
 router.post("/create-new-cart/:userId", createNewCart);
 //remove item from cart
+
 router.delete("/remove-item/:userId/:itemId", removeItemFromCart); 
 //update item quantity in cart
+
 router.put("/update-item-quantity/:userId/:itemId", updateItemQuantityInCart);
 //get cart by userId
+
 router.get("/cart/:userId", getCartByUserId);
 
 export default router;
