@@ -11,9 +11,20 @@ const orderSchema = new mongoose.Schema({
     }
   ],
   totalAmount: Number,
-  paymentMethod: { type: String, enum: ["COD", "PayPal"], default: "COD" },
-  status: { type: String, enum: ["Pending", "Shipped", "Completed"], default: "Pending" },
-  createdAt: { type: Date, default: Date.now }
+  paymentMethod: { 
+    type: String, 
+    enum: ["COD", "PayPal"], 
+    default: "COD" 
+  },
+  status: { 
+    type: String, 
+    enum: ["Pending", "Shipped", "Completed"], 
+    default: "Pending" 
+  },
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
+  }
 });
 
 export default mongoose.model("Order", orderSchema);

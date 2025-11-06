@@ -13,6 +13,7 @@ const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
 loadEnv(envFileURL, dotenvFlow);
 
 const AuthPort = process.env.AuthenticationService_PORT
+const ProductPort = process.env.ProductService_PORT
 
 export const addToCart = async (req, res) => {
   try {
@@ -21,9 +22,25 @@ export const addToCart = async (req, res) => {
     let cart = await Cart.findOne({ userId: userId });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-    cart.items = cart.items.concat(item);
+    const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${item.productId}`);
+
+    if (productResponse.data.success === false) {
+        return res.status(404).json({ message: "Product not found" });
+    }
+
+    console.log('Product Response:', productResponse.data.product);
+
+    let existingItemIndex = cart.items.findIndex(cartItem => cartItem.productId.toString() === item.productId);
+
+    if (existingItemIndex !== -1) {
+        cart.items[existingItemIndex].quantity += item.quantity;
+        cart.totalAmount += productResponse.data.product.price * item.quantity;
+        await cart.save();
+        return res.status(200).json(cart);
+    }
     
-    cart.totalAmount = item.price * item.quantity + (cart.totalAmount || 0);
+    cart.totalAmount += productResponse.data.product.price * item.quantity;
+    cart.items.push(item);
     await cart.save();
 
     res.status(200).json(cart);
@@ -67,17 +84,23 @@ export const createNewCart = async (req, res) => {
 //remove item from cart
 export const removeItemFromCart = async (req, res) => {
     try {
-        const { userId, itemId } = req.params;      
+        const { userId, itemId } = req.params;    
+        
         const cart = await Cart.findOne({ userId: userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
+        
+        const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${itemId}`);
+        if (productResponse.data.success === false) {
+            return res.status(404).json({ message: "Product not found" });
+        }
 
-        const itemIndex = cart.items.findIndex(item => item.productId.toString() === itemId); //ilidi nig item._id if naanay Item IDs
+        const itemIndex = cart.items.findIndex(item => item.productId.toString() === itemId);
 
         if (itemIndex === -1) {
             return res.status(404).json({ message: "Item not found in cart" });
         }
         const item = cart.items[itemIndex];
-        cart.totalAmount -= item.price * item.quantity;
+        cart.totalAmount -= productResponse.data.product.price * item.quantity;
         cart.items.splice(itemIndex, 1);
         await cart.save();
         res.status(200).json({ message: "Item removed from cart", cart });
@@ -87,17 +110,25 @@ export const removeItemFromCart = async (req, res) => {
 }
 
 //update item quantity in cart
-export const updateItemQuantityInCart = async (req, res) => {
+export const reduceItemQuantityInCart = async (req, res) => {
     try {
         const { userId, itemId } = req.params;
         const { quantity } = req.body;
+
+        const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${itemId}`);
+        if (productResponse.data.success === false) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
         const cart = await Cart.findOne({ userId: userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
-        const item = cart.items.find(item => item.productId.toString() === itemId); //ilidi nig item._id if naanay Item IDs
+
+        const item = cart.items.find(item => item.productId.toString() === itemId);
         if (!item) {
             return res.status(404).json({ message: "Item not found in cart" });
         }
-        cart.totalAmount += (quantity - item.quantity) * item.price;
+
+        cart.totalAmount += (quantity - item.quantity) * productResponse.data.product.price;
         item.quantity = quantity;
         await cart.save();
         res.status(200).json({ message: "Item quantity updated", cart });
