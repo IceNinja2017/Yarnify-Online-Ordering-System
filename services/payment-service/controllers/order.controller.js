@@ -13,7 +13,7 @@ export const getUserOrders = async (req, res) => {
   }
 }
 
-export const updatedOrderById = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const orderId = req.params.orderId;
