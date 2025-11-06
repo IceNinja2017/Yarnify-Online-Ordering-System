@@ -13,3 +13,5 @@ export const ConnectCloudinary = async () => {
         console.error("Error configuring Cloudinary:", error);
     }
 }
+
+export { cloudinary };
