@@ -11,6 +11,7 @@ const app = express();
 const PORT = process.env.ProductService_PORT;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
+app.use(express.json());
 app.use('/api/products', productRoutes);
 
 app.listen(PORT, () =>{
