@@ -9,7 +9,7 @@ import paymentRoutes from "./routes/payment.route.js";
 loadEnv(import.meta.url, dotenvFlow);
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PaymentService_PORT;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
 app.use(cors());
