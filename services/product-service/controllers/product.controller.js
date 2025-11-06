@@ -81,4 +81,10 @@ export const getProductsByCategory = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }   
-}        
+}
+
+//search products by name or description
+
+//update product details
+
+//delete product from database
