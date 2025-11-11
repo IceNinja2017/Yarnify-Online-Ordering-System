@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar.jsx"
 import HomePage from "./pages/HomePage.jsx"
 import Footer from "./components/Footer.jsx"
 import { AuthProvider } from "./context/AuthContext.jsx"
+import PaymentReturnPage from "./pages/PaymentReturnPage.jsx"
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegistrationPage />} />
+            <Route path="/payment/return" element={<PaymentReturnPage/>} />
           </Routes>
         </div>
 

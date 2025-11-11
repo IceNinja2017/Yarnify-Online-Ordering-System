@@ -4,9 +4,11 @@ import { Menu, X } from "lucide-react";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 const Navbar = () => {
+    const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false);
     const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
 
