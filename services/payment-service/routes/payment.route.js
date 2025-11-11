@@ -1,6 +1,6 @@
 import express from "express";
 import { validateToken } from "../middleware/auth.js";
-import { getUserOrders, updateOrderStatus, newOrderCOD, getAllOrders, getOrdersByStatus,newOrderPaypal} from "../controllers/order.controller.js"
+import { getUserOrders, updateOrderStatus, newOrderCOD, getAllOrders, getOrdersByStatus,newOrderPaypal, capturePaypalOrder} from "../controllers/order.controller.js"
 import { addToCart, createNewCart, removeItemFromCart, reduceItemQuantityInCart, getCartByUserId } from "../controllers/cart.controller.js"
 
 const router = express.Router();
@@ -14,6 +14,7 @@ router.post("/cod",validateToken, newOrderCOD);
 //add new paypal order
 router.post("/paypal", validateToken, newOrderPaypal);
 
+router.post("/capture-paypal-order", validateToken, capturePaypalOrder);
 //get order from user id
 router.get("/orders", getAllOrders);
 

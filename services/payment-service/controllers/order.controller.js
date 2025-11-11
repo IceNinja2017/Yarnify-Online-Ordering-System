@@ -191,3 +191,30 @@ export const getOrdersByStatus = async (req, res) => {
     }
 }
 
+//capture paypal order
+export const capturePaypalOrder = async (req, res) => {
+  try {
+    const { orderId, payerId } = req.body;
+    const accessToken = await getAccessTokenFromPayPal();
+
+    const response = await axios.post(  
+      `${process.env.PAYPAL_API_BASE}/v2/checkout/orders/${orderId}/capture`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    console.log("PayPal Capture Response:", response.data);
+
+    // Update order status in your database
+    //no 
+
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Error capturing PayPal order:', error.response ? error.response.data : error.message);
+    res.status(500).json({ message: 'Error capturing PayPal order' });
+  }
+};

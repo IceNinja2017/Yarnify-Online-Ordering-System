@@ -5,6 +5,7 @@ import { loadEnv } from "../config/loadEnv.js";
 import { connectDB } from "../config/db.js";
 import mongoose from "mongoose";
 import paymentRoutes from "./routes/payment.route.js";
+import cookieParser from "cookie-parser";
 
 loadEnv(import.meta.url, dotenvFlow);
 
@@ -12,7 +13,12 @@ const app = express();
 const PORT = process.env.PaymentService_PORT;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+    origin: process.env.FRONTEND_BASE_URL,
+    credentials: true,
+}));
+
 app.use(express.json());
 
 // ROUTES

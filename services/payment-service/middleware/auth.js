@@ -13,9 +13,15 @@ loadEnv(envFileURL, dotenvFlow);
 
 
 export const validateToken = (req, res, next) => {
-    const token = req.headers["authorization"]?.split(" ")[1];
+    // 1. Try header first (optional)
+    let token = req.headers["authorization"]?.split(" ")[1];
+
+    // 2. If no header, try cookie
+    if (!token && req.cookies?.token) {
+        token = req.cookies.token;
+    }
+
     console.log("Validating token:", token);
-    console.log("Using JWT_SECRET:", process.env.JWT_SECRET);
 
     if (!token) {
         return res.status(401).json({ success: false, message: "Unauthorized - No token provided" });
@@ -23,11 +29,6 @@ export const validateToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        if (!decoded) {
-            return res.status(401).json({ success: false, message: "Unauthorized - Invalid token" });
-        }
-
         req.userId = decoded.userId;
         next();
     } catch (error) {
