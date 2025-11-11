@@ -8,5 +8,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    port: 5173,
+    proxy: {
+      "/api/payment/paypal": "http://localhost:5001"
+    }
+  }
   
 })

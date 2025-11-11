@@ -2,21 +2,37 @@ import { motion } from "framer-motion";
 import Input from "../components/Input";
 import { Mail, LockKeyhole } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const LoginPage = () => {
+    const { setIsLoggedIn } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
 
         const data = {
             email: email,
             password: password,
         };
+        console.log(JSON.stringify(data))
 
-        console.log(JSON.stringify(data, null, 2));
+        try {
+            const response = await axios.post("http://localhost:5000/api/auth/login", data, {
+                withCredentials: true
+            });
+            console.log("Login success:", response.data);
+            setIsLoggedIn(true);
+            navigate("/dashboard");
+        } catch (error) {
+            console.error("Login failed:", error.response?.data || error.message);
+            alert(error.response?.data?.message || "Login failed");
+        }
     };
 
     return (

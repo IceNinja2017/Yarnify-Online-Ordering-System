@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -63,6 +64,16 @@ const userSchema = new mongoose.Schema({
             ref: "Order"
         }
     ],
+    profileImage: {
+    url: { 
+        type: String, 
+        default: 'https://res.cloudinary.com/de3p2nwrz/image/upload/v1762659526/defaultProfile.jpg'
+    },
+    public_id: { 
+        type: String, 
+        default: 'defaultProfile' 
+    }
+}
 }, {timestamps: true});
 //createdat and updatedat fields are automaticallu added into the document
 

@@ -5,6 +5,7 @@ import { loadEnv } from "../config/loadEnv.js";
 import { connectDB } from "../config/db.js";
 import mongoose, { get } from "mongoose";
 import authRoutes from "./routes/auth.route.js"
+import cors from "cors";
 
 loadEnv(import.meta.url, dotenvFlow);
 
@@ -16,6 +17,11 @@ app.listen(PORT, () =>{
     connectDB(mongoose);
     console.log(SERVICE_NAME + " Server started at http://localhost:" + PORT);
 });
+
+app.use(cors({
+    origin: process.env.FRONTEND_BASE_URL,
+    credentials: true,
+}));
 
 app.use(express.json()); // parse incoming JSON request
 app.use(cookieParser()); // parse cookies
