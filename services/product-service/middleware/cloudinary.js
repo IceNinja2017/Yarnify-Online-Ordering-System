@@ -1,4 +1,4 @@
-import { ConnectCloudinary, cloudinary } from "./cloudinary.config";
+import { ConnectCloudinary, cloudinary } from "./cloudinary.config.js";
 
 ConnectCloudinary();
 

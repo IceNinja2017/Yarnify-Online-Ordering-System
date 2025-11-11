@@ -1,6 +1,7 @@
 import express from "express";
-import { addProduct, dummyFunction, getProductById, getAllProducts, getProductsByCategory } from "../controllers/product.controller.js";
+import { addProduct, dummyFunction, getProductById, getAllProducts, getProductsByCategory, searchProducts, updateProduct, deleteProduct } from "../controllers/product.controller.js";
 import { get } from "mongoose";
+import { uploadMultipleFiles, uploadSingleFile } from "../middleware/fileHandling.js";
 
 const router = express.Router();
 
@@ -14,16 +15,17 @@ router.get("/get-product/:id", getProductById)
 router.get("/category/:category", getProductsByCategory)
 
 //Search Products
-router.get("/search/:query", dummyFunction);
+router.get("/search/:query", searchProducts);
 
 //Add Product to Database
-router.post("/product", addProduct);
+router.post("/product",  uploadSingleFile('image'), addProduct);
+router.post("/product",  uploadMultipleFiles('image', 5), addProduct);
 
 //Delete Product from Database
-router.delete("/product", dummyFunction);
+router.delete("/product/:id", deleteProduct);
 
 //Update Product in Database
-router.put("/product", dummyFunction);
+router.put("/product/:id", updateProduct);
 
 
 
