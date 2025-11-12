@@ -3,7 +3,8 @@ import Input from "../components/Input";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { User, Mail, LockKeyhole, MapPin, Home, Globe, Building2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const RegistrationPage = () => {
     const [name, setName] = useState('');
@@ -16,8 +17,9 @@ const RegistrationPage = () => {
     const [postal, setPostal] = useState('');
     const [country, setCountry] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const navigate = useNavigate()
 
-    const handleRegistration = (e) => {
+    const handleRegistration = async (e) => {
         e.preventDefault();
 
         if (confirmPass !== password) {
@@ -41,6 +43,18 @@ const RegistrationPage = () => {
                 country: country,
             },
         };
+
+        try {
+            const response = await axios.post("http://localhost:5000/api/auth/register", data, {
+                withCredentials: true
+            });
+            console.log("Registration success:", response.data);
+            navigate("/verify-email");
+
+        } catch (error) {
+            console.error("Login failed:", error.response?.data || error.message);
+            alert(error.response?.data?.message || "Login failed");
+        }
 
         console.log(JSON.stringify(data, null, 2));
     };
