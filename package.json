@@ -13,5 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3"
   }
 }

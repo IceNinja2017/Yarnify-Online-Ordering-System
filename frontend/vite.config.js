@@ -11,7 +11,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api/payment/paypal": "http://localhost:5001"
+      "/paypal": "http://localhost:5001/api/payment",
     }
   }
   
