@@ -39,4 +39,17 @@ const productSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+productSchema.pre("findOneAndUpdate", function(next) {
+    const update = this.getUpdate();
+    if (update.stock !== undefined) {
+        if (update.stock <= 0) {
+            update.isActive = false;
+        } else {
+            update.isActive = true;
+        }
+        this.setUpdate(update);
+    }
+    next();
+});
+
 export default mongoose.model("Product", productSchema);
