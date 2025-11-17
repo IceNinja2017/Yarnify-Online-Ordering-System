@@ -14,11 +14,26 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [showCart, setShowCart] = useState(false);
     const { isLoggedIn, setIsLoggedIn, userId } = useContext(AuthContext);
+    const [profileImage, setProfileImage] = useState("https://placehold.co/40x40?text=?");
 
     useEffect(() => {
         axios
             .get("http://localhost:5000/api/auth/me", { withCredentials: true })
-            .then((res) => setIsLoggedIn(res.data.loggedIn))
+            .then((res) => {
+                setIsLoggedIn(res.data.loggedIn);
+
+                if (res.data.loggedIn) {
+                    axios
+                        .get(`http://localhost:5000/api/auth/${res.data.user._id}`, { withCredentials: true })
+                        .then((userRes) => {
+                            setProfileImage(
+                                userRes.data.user.profileImage?.url && userRes.data.user.profileImage.url.trim() !== ""
+                                    ? userRes.data.user.profileImage.url
+                                    : "https://placehold.co/40x40?text=?"
+                            );
+                        });
+                }
+            })
             .catch(() => setIsLoggedIn(false));
     }, []);
 
@@ -55,9 +70,15 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <a href="/dashboard" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Dashboard</a>
+                                <a href="/shop" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Shop</a>
                                 <a href="/orders" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Orders</a>
-                                <a href="/profile" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Profile</a>
+                                <a href="/profile" className="flex items-center gap-3">
+                                    <img
+                                        src={profileImage || "https://placehold.co/40x40?text=?"}
+                                        alt="Profile"
+                                        className="w-10 h-10 rounded-full object-cover border border-[#d3ab9e]"
+                                    />
+                                </a>
 
                                 {/* Cart Icon */}
                                 <button
@@ -115,9 +136,16 @@ const Navbar = () => {
                         </>
                     ) : (
                         <>
-                            <a href="/dashboard" className="block text-[#BD8F80] font-medium">Dashboard</a>
+                            <a href="/shop" className="block text-[#BD8F80] font-medium">Shop</a>
                             <a href="/orders" className="block text-[#BD8F80] font-medium">Orders</a>
-                            <a href="/profile" className="block text-[#BD8F80] font-medium">Profile</a>
+                            <a href="/profile" className="flex items-center gap-3">
+                                <img
+                                    src={profileImage || "https://placehold.co/40x40?text=?"}
+                                    alt="Profile"
+                                    className="w-10 h-10 rounded-full object-cover border border-[#d3ab9e]"
+                                />
+                                <span className="text-[#BD8F80] font-medium">Profile</span>
+                            </a>
 
                             <button
                                 onClick={handleLogout}

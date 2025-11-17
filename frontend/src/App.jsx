@@ -10,6 +10,9 @@ import { AuthProvider } from "./context/AuthContext.jsx"
 import PaymentReturnPage from "./pages/PaymentReturnPage.jsx"
 import EmailVerificationPage from "./pages/EmailVerificationPage.jsx"
 import { Toaster } from "react-hot-toast"
+import ShopPage from "./pages/ShopPage.jsx"
+import OrdersPage from "./pages/OrdersPage.jsx"
+import ProfilePage from "./pages/ProfilePage.jsx"
 
 function App() {
   return (
@@ -70,6 +73,9 @@ function App() {
             <Route path="/verify-email" element={<EmailVerificationPage />} />
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/payment/return" element={<PaymentReturnPage/>} />
+            <Route path="/shop" element={<ShopPage/>}/>
+            <Route path="/orders" element={<OrdersPage/>}/>
+            <Route path="/profile" element={<ProfilePage/>}/>
           </Routes>
         </div>
 

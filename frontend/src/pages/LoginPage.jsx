@@ -28,7 +28,7 @@ const LoginPage = () => {
             });
             console.log("Login success:", response.data);
             setIsLoggedIn(true);
-            navigate("/dashboard");
+            navigate("/shop");
         } catch (error) {
             console.error("Login failed:", error.response?.data || error.message);
             alert(error.response?.data?.message || "Login failed");
