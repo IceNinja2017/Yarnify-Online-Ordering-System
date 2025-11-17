@@ -6,19 +6,55 @@ const CartBubble = ({ onClose, userId }) => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch cart items on open
     useEffect(() => {
         if (!userId) return;
 
-        axios
-            .get(`http://localhost:5001/api/payment/cart/${userId}`, { withCredentials: true })
-            .then((res) => {
-                setCartItems(res.data.items || []);
-            })
-            .catch((err) => {
+        const fetchCart = async () => {
+            try {
+                // 1. Get cart items
+                const { data } = await axios.get(
+                    `http://localhost:5001/api/payment/cart/${userId}`,
+                    { withCredentials: true }
+                );
+
+                const items = data.items || [];
+
+                if (items.length === 0) {
+                    setCartItems([]);
+                    return;
+                }
+
+                // 2. Fetch product info for each item in parallel
+                const itemsWithNames = await Promise.all(
+                    items.map(async (item) => {
+                        try {
+                            const res = await axios.get(
+                                `http://localhost:5002/api/products/get-product/${item.productId}`
+                            );
+                            return {
+                                ...item,
+                                name: res.data.product.name,
+                            };
+                            console.log(res.data)
+                        } catch (err) {
+                            console.error("Failed to fetch product:", item.productId, err);
+                            return {
+                                ...item,
+                                name: "Unknown Product",
+                            };
+                        }
+                    })
+                );
+
+                setCartItems(itemsWithNames);
+            } catch (err) {
                 console.error("Failed to load cart:", err);
-            })
-            .finally(() => setLoading(false));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCart();
     }, [userId]);
 
     // Close bubble when clicking outside
@@ -39,15 +75,12 @@ const CartBubble = ({ onClose, userId }) => {
         >
             <h3 className="text-lg font-semibold text-[#916556] mb-3">Your Cart</h3>
 
-            {/* Loading */}
             {loading && <p className="text-[#BD8F80]">Loading...</p>}
 
-            {/* Empty cart */}
             {!loading && cartItems.length === 0 && (
                 <p className="text-[#BD8F80]">Your cart is empty.</p>
             )}
 
-            {/* Items List */}
             {!loading && cartItems.length > 0 && (
                 <ul className="space-y-2">
                     {cartItems.map((item) => (
@@ -55,7 +88,7 @@ const CartBubble = ({ onClose, userId }) => {
                             key={item._id}
                             className="flex justify-between items-center text-sm text-[#916556] bg-[#fffbff] p-2 rounded-lg border border-[#efd7d0]"
                         >
-                            <span>{item.productName}</span>
+                            <span>{item.name}</span>
                             <span>x{item.quantity}</span>
                         </li>
                     ))}

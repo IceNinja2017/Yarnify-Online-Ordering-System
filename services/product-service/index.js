@@ -5,6 +5,7 @@ import { connectDB } from "../config/db.js";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors";
 
 // Import your routes
 import productRoutes from "./routes/product.route.js";
@@ -18,6 +19,12 @@ const SERVICE_NAME = process.env.SERVICE_NAME;
 // Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+app.use(cors({
+    origin: process.env.FRONTEND_BASE_URL,
+    credentials: true,
+}));
 
 // ------------------- Middleware -------------------
 app.use(express.json());
