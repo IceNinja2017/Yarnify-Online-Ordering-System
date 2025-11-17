@@ -25,7 +25,6 @@ export const me = async (req, res) => {
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET); // make sure JWT_SECRET matches what you used to sign
         const userId = decoded.userId; // assuming your token payload has { id: user._id }
-        console.log(decoded)
         // Optionally, fetch full user info if needed
         const user = await User.findById(userId).select("_id username email address role profileImage"); // select fields you want to return
 

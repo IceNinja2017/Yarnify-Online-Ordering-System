@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
 import { sendVerificationEmain, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from "../gmail/emails.js";
 import axios from "axios";
+import jwt from "jsonwebtoken";
 
 import dotenvFlow from "dotenv-flow";
 import { loadEnv } from "../../config/loadEnv.js";
@@ -295,3 +296,66 @@ export const resetPassword = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+//update user profile with username email address{street, city, state, postalCode, country} and profileImage{url, public_id}
+export const updateProfile = async (req, res) => {
+    try {
+        const updates = req.body || {};
+        const token = req.cookies.token;
+
+        if (!token) return res.status(401).json({ loggedIn: false });
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const setUpdates = {};
+
+        // Top-level field
+        if (updates.username !== undefined) setUpdates["username"] = updates.username;
+
+        // Nested address fields
+        if (updates.address) {
+            for (const key of ["street", "city", "state", "postalCode", "country"]) {
+                if (updates.address[key] !== undefined) {
+                    setUpdates[`address.${key}`] = updates.address[key];
+                }
+            }
+        }
+
+        // Nested profileImage fields
+        if (updates.profileImage) {
+            for (const key of ["url", "public_id"]) {
+                if (updates.profileImage[key] !== undefined) {
+                    setUpdates[`profileImage.${key}`] = updates.profileImage[key];
+                }
+            }
+        }
+
+        const user = await User.findOneAndUpdate(
+            { _id: userId },
+            { $set: setUpdates },
+            { new: true, runValidators: true }
+        );
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: "User Not Found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Profile Updated Successfully",
+            user: {
+                ...user._doc,
+                password: undefined,
+                passwordResetToken: undefined,
+                passwordResetExpiresAt: undefined,
+                verificationToken: undefined,
+                verificationTokenExpiresAt: undefined,
+            },
+        });
+
+    } catch (error) {
+        console.error("Error in updating profile:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};

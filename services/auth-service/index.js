@@ -24,5 +24,6 @@ app.use(cors({
 }));
 
 app.use(express.json()); // parse incoming JSON request
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // parse cookies
 app.use("/api/auth", authRoutes);
