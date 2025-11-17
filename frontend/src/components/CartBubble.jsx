@@ -3,45 +3,32 @@ import axios from "axios";
 
 const CartBubble = ({ onClose, userId }) => {
     const bubbleRef = useRef(null);
+    const [cart, setCart] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Fetch cart items
     useEffect(() => {
         if (!userId) return;
 
         const fetchCart = async () => {
             try {
-                // 1. Get cart items
                 const { data } = await axios.get(
                     `http://localhost:5001/api/payment/cart/${userId}`,
                     { withCredentials: true }
                 );
-
+                setCart(data)
                 const items = data.items || [];
 
-                if (items.length === 0) {
-                    setCartItems([]);
-                    return;
-                }
-
-                // 2. Fetch product info for each item in parallel
                 const itemsWithNames = await Promise.all(
                     items.map(async (item) => {
                         try {
                             const res = await axios.get(
                                 `http://localhost:5002/api/products/get-product/${item.productId}`
                             );
-                            return {
-                                ...item,
-                                name: res.data.product.name,
-                            };
-                            console.log(res.data)
-                        } catch (err) {
-                            console.error("Failed to fetch product:", item.productId, err);
-                            return {
-                                ...item,
-                                name: "Unknown Product",
-                            };
+                            return { ...item, name: res.data.product.name };
+                        } catch {
+                            return { ...item, name: "Unknown Product" };
                         }
                     })
                 );
@@ -68,6 +55,26 @@ const CartBubble = ({ onClose, userId }) => {
         return () => document.removeEventListener("mousedown", handleOutsideClick);
     }, [onClose]);
 
+    // Update quantity
+    const changeQuantity = async (cartId, itemId, newQuantity) => {
+        if (newQuantity < 1) return; // optional: prevent quantity below 1
+        try {
+            await axios.put(
+                `http://localhost:5001/api/payment/update-item-quantity/${cart._id}/${itemId}`,
+                { quantity: newQuantity },
+                { withCredentials: true }
+            );
+            // Update UI
+            setCartItems((prev) =>
+                prev.map((item) =>
+                    item._id === itemId ? { ...item, quantity: newQuantity } : item
+                )
+            );
+        } catch (err) {
+            console.error("Failed to update quantity:", err);
+        }
+    };
+
     return (
         <div
             ref={bubbleRef}
@@ -89,7 +96,21 @@ const CartBubble = ({ onClose, userId }) => {
                             className="flex justify-between items-center text-sm text-[#916556] bg-[#fffbff] p-2 rounded-lg border border-[#efd7d0]"
                         >
                             <span>{item.name}</span>
-                            <span>x{item.quantity}</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => changeQuantity(item.cartId, item._id, item.quantity - 1)}
+                                    className="px-2 py-1 bg-[#d3ab9e] text-white rounded"
+                                >
+                                    -
+                                </button>
+                                <span>{item.quantity}</span>
+                                <button
+                                    onClick={() => changeQuantity(item.cartId, item._id, item.quantity + 1)}
+                                    className="px-2 py-1 bg-[#d3ab9e] text-white rounded"
+                                >
+                                    +
+                                </button>
+                            </div>
                         </li>
                     ))}
                 </ul>
