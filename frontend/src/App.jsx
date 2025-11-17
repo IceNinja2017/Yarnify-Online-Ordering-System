@@ -61,9 +61,7 @@ function App() {
       <AuthProvider>
         <Toaster position="top-center" reverseOrder={false} />
         {/* Navbar should be above background */}
-        <div className="relative z-10">
-          <Navbar />
-        </div>
+        <Navbar />
 
         {/* Page content */}
         <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-4rem)]">
