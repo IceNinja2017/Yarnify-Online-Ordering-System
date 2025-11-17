@@ -27,7 +27,7 @@ export const me = async (req, res) => {
         const userId = decoded.userId; // assuming your token payload has { id: user._id }
         console.log(decoded)
         // Optionally, fetch full user info if needed
-        const user = await User.findById(userId).select("_id email username"); // select fields you want to return
+        const user = await User.findById(userId).select("_id username email address role profileImage"); // select fields you want to return
 
         return res.status(200).json({
             loggedIn: true,
