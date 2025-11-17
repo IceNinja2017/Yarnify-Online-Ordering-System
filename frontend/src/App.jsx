@@ -8,6 +8,8 @@ import HomePage from "./pages/HomePage.jsx"
 import Footer from "./components/Footer.jsx"
 import { AuthProvider } from "./context/AuthContext.jsx"
 import PaymentReturnPage from "./pages/PaymentReturnPage.jsx"
+import EmailVerificationPage from "./pages/EmailVerificationPage.jsx"
+import { Toaster } from "react-hot-toast"
 
 function App() {
   return (
@@ -54,6 +56,7 @@ function App() {
       />
       
       <AuthProvider>
+        <Toaster position="top-center" reverseOrder={false} />
         {/* Navbar should be above background */}
         <div className="relative z-10">
           <Navbar />
@@ -64,6 +67,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/verify-email" element={<EmailVerificationPage />} />
             <Route path="/register" element={<RegistrationPage />} />
             <Route path="/payment/return" element={<PaymentReturnPage/>} />
           </Routes>
