@@ -86,6 +86,11 @@ const LoginPage = () => {
                         Login
                     </motion.button>
                 </form>
+                <div className='mt-4 text-center'>
+                    <Link to={"/forgot-password"} className='text-sm text-[#aa6049] hover:underline'>
+                        Forgot Password?
+                    </Link>
+                </div>
             </div>
             <div className='px-8 py-4 bg-[#d4a394] bg-opacity-50 flex justify-center'>
                 <p className='text-sm text-[#f5eae8]'>
