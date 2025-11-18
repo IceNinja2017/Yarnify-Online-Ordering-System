@@ -17,7 +17,7 @@ const CartBubble = ({ onClose, userId }) => {
                     `http://localhost:5001/api/payment/cart/${userId}`,
                     { withCredentials: true }
                 );
-                setCart(data)
+                setCart(data);
                 const items = data.items || [];
 
                 const itemsWithNames = await Promise.all(
@@ -56,18 +56,19 @@ const CartBubble = ({ onClose, userId }) => {
     }, [onClose]);
 
     // Update quantity
-    const changeQuantity = async (cartId, itemId, newQuantity) => {
-        if (newQuantity < 1) return; // optional: prevent quantity below 1
+    const changeQuantity = async (productId, newQuantity) => {
+        if (newQuantity < 1) return; // prevent 0 or below
         try {
             await axios.put(
-                `http://localhost:5001/api/payment/update-item-quantity/${cart._id}/${itemId}`,
+                `http://localhost:5001/api/payment/update-item-quantity/${userId}/${productId}`,
                 { quantity: newQuantity },
                 { withCredentials: true }
             );
+
             // Update UI
             setCartItems((prev) =>
                 prev.map((item) =>
-                    item._id === itemId ? { ...item, quantity: newQuantity } : item
+                    item.productId === productId ? { ...item, quantity: newQuantity } : item
                 )
             );
         } catch (err) {
@@ -92,20 +93,20 @@ const CartBubble = ({ onClose, userId }) => {
                 <ul className="space-y-2">
                     {cartItems.map((item) => (
                         <li
-                            key={item._id}
+                            key={item.productId}
                             className="flex justify-between items-center text-sm text-[#916556] bg-[#fffbff] p-2 rounded-lg border border-[#efd7d0]"
                         >
                             <span>{item.name}</span>
                             <div className="flex items-center gap-2">
                                 <button
-                                    onClick={() => changeQuantity(item.cartId, item._id, item.quantity - 1)}
+                                    onClick={() => changeQuantity(item.productId, item.quantity - 1)}
                                     className="px-2 py-1 bg-[#d3ab9e] text-white rounded"
                                 >
                                     -
                                 </button>
                                 <span>{item.quantity}</span>
                                 <button
-                                    onClick={() => changeQuantity(item.cartId, item._id, item.quantity + 1)}
+                                    onClick={() => changeQuantity(item.productId, item.quantity + 1)}
                                     className="px-2 py-1 bg-[#d3ab9e] text-white rounded"
                                 >
                                     +
