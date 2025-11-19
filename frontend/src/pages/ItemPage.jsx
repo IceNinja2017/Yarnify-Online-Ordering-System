@@ -9,9 +9,24 @@ export default function ItemPage() {
     const { id } = useParams();
     const [item, setItem] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [previewIndex, setPreviewIndex] = useState(0);
+    const [userId, setUserId] = useState(null);
 
+    // Fetch logged user info
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/api/auth/me", {
+                    withCredentials: true,
+                });
+                setUserId(res.data.user._id);
+            } catch (err) {
+                console.error("Not logged in or failed to fetch user");
+            }
+        };
+        fetchUser();
+    }, []);
+
+    // Fetch item
     useEffect(() => {
         const fetchItem = async () => {
             try {
@@ -27,14 +42,24 @@ export default function ItemPage() {
     }, [id]);
 
     const handleAddToCart = async () => {
+        if (!userId) return toast.error("Please login to add products to cart");
+
         try {
-            await axios.post("http://localhost:5001/api/payment/add-to-cart", {
-                productId: id,
-                quantity: 1
-            });
+            await axios.post(
+                "http://localhost:5001/api/payment/add-to-cart",
+                {
+                    userId,
+                    item: {
+                        productId: id,
+                        quantity: 1,
+                    },
+                },
+                { withCredentials: true }
+            );
+
             toast.success("Added to cart");
         } catch (err) {
-            toast.error("Failed to add to cart");
+            toast.error(err.response?.data?.message || "Failed to add to cart");
         }
     };
 
@@ -50,27 +75,11 @@ export default function ItemPage() {
                             <img
                                 src={img.url}
                                 alt="item"
-                                className="rounded-2xl h-100 object-cover mx-auto cursor-pointer"
-                                onClick={() => { setPreviewIndex(index); setPreviewOpen(true); }}
+                                className="rounded-2xl h-100 object-cover mx-auto"
                             />
                         </div>
                     ))}
                 </Carousel>
-
-                {previewOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-                        <div className="relative w-[90%] max-w-3xl">
-                            <button className="absolute top-2 right-2 text-white text-2xl" onClick={() => setPreviewOpen(false)}>×</button>
-                            <Carousel selectedItem={previewIndex} showThumbs={false} infiniteLoop>
-                                {item.image.map((img, idx) => (
-                                    <div key={idx}>
-                                        <img src={img.url} className="max-w-full max-h-[80vh] rounded-2xl mx-auto" />
-                                    </div>
-                                ))}
-                            </Carousel>
-                        </div>
-                    </div>
-                )}
 
                 <h1 className="text-3xl font-bold mt-6" style={{ color: "#d3ab9e" }}>{item.title}</h1>
                 <p className="mt-2 text-lg" style={{ color: "#eac9c1" }}>{item.description}</p>
