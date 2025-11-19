@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";   // <-- ADD THIS
 
 const CartBubble = ({ onClose, userId }) => {
     const bubbleRef = useRef(null);
+    const navigate = useNavigate();               // <-- ADD THIS
+
     const [cart, setCart] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch cart items
     useEffect(() => {
         if (!userId) return;
 
@@ -17,6 +19,7 @@ const CartBubble = ({ onClose, userId }) => {
                     `http://localhost:5001/api/payment/cart/${userId}`,
                     { withCredentials: true }
                 );
+
                 setCart(data);
                 const items = data.items || [];
 
@@ -44,20 +47,8 @@ const CartBubble = ({ onClose, userId }) => {
         fetchCart();
     }, [userId]);
 
-    // Close bubble when clicking outside
-    useEffect(() => {
-        const handleOutsideClick = (e) => {
-            if (bubbleRef.current && !bubbleRef.current.contains(e.target)) {
-                onClose();
-            }
-        };
-        document.addEventListener("mousedown", handleOutsideClick);
-        return () => document.removeEventListener("mousedown", handleOutsideClick);
-    }, [onClose]);
-
-    // Update quantity
     const changeQuantity = async (productId, newQuantity) => {
-        if (newQuantity < 1) return; // prevent 0 or below
+        if (newQuantity < 1) return;
         try {
             await axios.put(
                 `http://localhost:5001/api/payment/update-item-quantity/${userId}/${productId}`,
@@ -65,7 +56,6 @@ const CartBubble = ({ onClose, userId }) => {
                 { withCredentials: true }
             );
 
-            // Update UI
             setCartItems((prev) =>
                 prev.map((item) =>
                     item.productId === productId ? { ...item, quantity: newQuantity } : item
@@ -76,6 +66,11 @@ const CartBubble = ({ onClose, userId }) => {
         }
     };
 
+    const handleCheckout = () => {
+        if (!cart?._id) return;
+        navigate(`/check-out/${cart._id}`);        // <-- Navigate to checkout page
+    };
+
     return (
         <div
             ref={bubbleRef}
@@ -84,7 +79,6 @@ const CartBubble = ({ onClose, userId }) => {
             <h3 className="text-lg font-semibold text-[#916556] mb-3">Your Cart</h3>
 
             {loading && <p className="text-[#BD8F80]">Loading...</p>}
-
             {!loading && cartItems.length === 0 && (
                 <p className="text-[#BD8F80]">Your cart is empty.</p>
             )}
@@ -117,9 +111,19 @@ const CartBubble = ({ onClose, userId }) => {
                 </ul>
             )}
 
+            {/* CHECKOUT BUTTON */}
+            {cartItems.length > 0 && (
+                <button
+                    onClick={handleCheckout}
+                    className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+                >
+                    Checkout
+                </button>
+            )}
+
             <button
                 onClick={onClose}
-                className="mt-4 w-full bg-[#d3ab9e] text-white py-2 rounded-lg hover:bg-[#BD8F80]"
+                className="mt-2 w-full bg-[#d3ab9e] text-white py-2 rounded-lg hover:bg-[#BD8F80]"
             >
                 Close
             </button>

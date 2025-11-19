@@ -73,6 +73,8 @@ const OrdersPage = () => {
                 <th className="px-4 py-2">Order ID</th>
                 <th className="px-4 py-2">Total</th>
                 <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Payment Method</th>
+                <th className="px-4 py-2">Payment Status</th>
               </tr>
             </thead>
             <tbody>
@@ -90,6 +92,18 @@ const OrdersPage = () => {
                     }`}
                   >
                     {order.status}
+                  </td>
+                  <td className="px-4 py-2">{order.paymentMethod}</td>
+                  <td
+                    className={`px-4 py-2 font-semibold ${
+                      order.paymentStatus === "Unpaid"
+                        ? "text-red-500"
+                        : order.paymentStatus === "Paid"
+                        ? "text-green-500"
+                        : "text-yellow-500"
+                    }`}
+                  >
+                    {order.paymentStatus}
                   </td>
                 </tr>
               ))}
