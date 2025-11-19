@@ -23,6 +23,7 @@ import CheckoutPage from "./pages/CheckoutPage.jsx"
 import AddItemPage from "./pages/AddItemPage.jsx"
 import AdminOrderPage from "./pages/AdminOrderPage.jsx"
 import InventoryPage from "./pages/InventoryPage.jsx"
+import AdminRoute from "./context/AdminRoutes.jsx"
 
 function App() {
   return (
@@ -92,10 +93,11 @@ function App() {
             <Route path="/item/:id" element={<ItemPage/>}/>
             <Route path="/check-out/:id" element={<CheckoutPage/>}/>
 
-            
-            <Route path="/add-item" element={<AddItemPage/>}/>
-            <Route path="/admin-order" element={<AdminOrderPage/>}/>
-            <Route path="/inventory" element={<InventoryPage/>}/>
+            <Route element={<AdminRoute />}>
+              <Route path="/add-item" element={<AddItemPage/>}/>
+              <Route path="/admin-order" element={<AdminOrderPage/>}/>
+              <Route path="/inventory" element={<InventoryPage/>}/>
+            </Route>
           </Routes>
         </div>
 

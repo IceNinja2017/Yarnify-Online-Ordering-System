@@ -8,7 +8,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const LoginPage = () => {
-    const { setIsLoggedIn } = useContext(AuthContext);
+    const { setIsLoggedIn, fetchMe } = useContext(AuthContext);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,6 +28,7 @@ const LoginPage = () => {
             });
             console.log("Login success:", response.data);
             setIsLoggedIn(true);
+            fetchMe();
             navigate("/shop");
         } catch (error) {
             console.error("Login failed:", error.response?.data || error.message);
