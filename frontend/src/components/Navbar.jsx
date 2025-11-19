@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
+import { useState, useEffect, useContext } from "react";
 import { Menu, X, ShoppingCart } from "lucide-react";
 import axios from "axios";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
-// ✅ import your CartBubble component
+import { AuthContext } from "../context/AuthContext";
 import CartBubble from "../components/CartBubble";
 
 const Navbar = () => {
@@ -15,6 +11,7 @@ const Navbar = () => {
     const [showCart, setShowCart] = useState(false);
     const { isLoggedIn, setIsLoggedIn, userId } = useContext(AuthContext);
     const [profileImage, setProfileImage] = useState("https://placehold.co/40x40?text=?");
+    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         axios
@@ -23,15 +20,13 @@ const Navbar = () => {
                 setIsLoggedIn(res.data.loggedIn);
 
                 if (res.data.loggedIn) {
-                    axios
-                        .get(`http://localhost:5000/api/auth/${res.data.user._id}`, { withCredentials: true })
-                        .then((userRes) => {
-                            setProfileImage(
-                                userRes.data.user.profileImage?.url && userRes.data.user.profileImage.url.trim() !== ""
-                                    ? userRes.data.user.profileImage.url
-                                    : "https://placehold.co/40x40?text=?"
-                            );
-                        });
+                    const user = res.data.user;
+                    setUserRole(user.role);
+                    setProfileImage(
+                        user.profileImage?.url && user.profileImage.url.trim() !== ""
+                            ? user.profileImage.url
+                            : "https://placehold.co/40x40?text=?"
+                    );
                 }
             })
             .catch(() => setIsLoggedIn(false));
@@ -45,13 +40,14 @@ const Navbar = () => {
 
     return (
         <nav className="bg-[#ebd8d0] shadow-md relative z-[10000]">
-            
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
-                    
+
                     {/* Logo */}
                     <div className="flex items-center">
-                        <h1 className="text-2xl font-bold text-[#916556]">Yarnify</h1>
+                        <h1 className="text-2xl font-bold text-[#916556] cursor-pointer" onClick={() => navigate("/")}>
+                            Yarnify
+                        </h1>
                     </div>
 
                     {/* Desktop Menu */}
@@ -71,16 +67,28 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <a href="/shop" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Shop</a>
-                                <a href="/orders" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Orders</a>
+                                <a
+                                    href={userRole === "admin" ? "/admin-order" : "/orders"}
+                                    className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium"
+                                >
+                                    Orders
+                                </a>
+
+                                {userRole === "admin" && (
+                                    <>
+                                        <a href="/add-item" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Add Item</a>
+                                        <a href="/inventory" className="text-[#BD8F80] hover:text-[#d3ab9e] font-medium">Inventory</a>
+                                    </>
+                                )}
+
                                 <a href="/profile" className="flex items-center gap-3">
                                     <img
-                                        src={profileImage || "https://placehold.co/40x40?text=?"}
+                                        src={profileImage}
                                         alt="Profile"
                                         className="w-10 h-10 rounded-full object-cover border border-[#d3ab9e]"
                                     />
                                 </a>
 
-                                {/* Cart Icon */}
                                 <button
                                     onClick={() => setShowCart(!showCart)}
                                     className="text-[#BD8F80] hover:text-[#d3ab9e]"
@@ -98,18 +106,13 @@ const Navbar = () => {
                         )}
                     </div>
 
-                    {/* Mobile Menu + Cart */}
+                    {/* Mobile Menu & Cart */}
                     <div className="md:hidden flex items-center space-x-4">
-
                         {isLoggedIn && (
-                            <button
-                                onClick={() => setShowCart(!showCart)}
-                                className="text-[#BD8F80]"
-                            >
+                            <button onClick={() => setShowCart(!showCart)} className="text-[#BD8F80]">
                                 <ShoppingCart size={26} />
                             </button>
                         )}
-
                         <button onClick={() => setIsOpen(!isOpen)} className="text-[#BD8F80]">
                             {isOpen ? <X size={28} /> : <Menu size={28} />}
                         </button>
@@ -117,10 +120,7 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* ✅ Use your CartBubble component */}
-            {showCart && (
-                <CartBubble onClose={() => setShowCart(false)} userId={userId} />
-            )}
+            {showCart && <CartBubble onClose={() => setShowCart(false)} userId={userId} />}
 
             {/* Mobile Dropdown */}
             {isOpen && (
@@ -137,10 +137,23 @@ const Navbar = () => {
                     ) : (
                         <>
                             <a href="/shop" className="block text-[#BD8F80] font-medium">Shop</a>
-                            <a href="/orders" className="block text-[#BD8F80] font-medium">Orders</a>
+                            <a
+                                href={userRole === "admin" ? "/admin-order" : "/orders"}
+                                className="block text-[#BD8F80] font-medium"
+                            >
+                                Orders
+                            </a>
+
+                            {userRole === "admin" && (
+                                <>
+                                    <a href="/add-item" className="block text-[#BD8F80] font-medium">Add Item</a>
+                                    <a href="/inventory" className="block text-[#BD8F80] font-medium">Inventory</a>
+                                </>
+                            )}
+
                             <a href="/profile" className="flex items-center gap-3">
                                 <img
-                                    src={profileImage || "https://placehold.co/40x40?text=?"}
+                                    src={profileImage}
                                     alt="Profile"
                                     className="w-10 h-10 rounded-full object-cover border border-[#d3ab9e]"
                                 />

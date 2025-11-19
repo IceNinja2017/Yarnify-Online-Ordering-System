@@ -20,6 +20,9 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx"
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx"
 import ItemPage from "./pages/ItemPage.jsx"
 import CheckoutPage from "./pages/CheckoutPage.jsx"
+import AddItemPage from "./pages/AddItemPage.jsx"
+import AdminOrderPage from "./pages/AdminOrderPage.jsx"
+import InventoryPage from "./pages/InventoryPage.jsx"
 
 function App() {
   return (
@@ -88,6 +91,11 @@ function App() {
             <Route path="/reset-password/:token" element={<ResetPasswordPage />}/>
             <Route path="/item/:id" element={<ItemPage/>}/>
             <Route path="/check-out/:id" element={<CheckoutPage/>}/>
+
+            
+            <Route path="/add-item" element={<AddItemPage/>}/>
+            <Route path="/admin-order" element={<AdminOrderPage/>}/>
+            <Route path="/inventory" element={<InventoryPage/>}/>
           </Routes>
         </div>
 
