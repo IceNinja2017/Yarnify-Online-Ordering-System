@@ -1,5 +1,6 @@
-// src/pages/Shop.jsx
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import ProductCard from "../components/ProductCard";
 
 const ShopPage = () => {
   const [categories] = useState([
@@ -11,14 +12,26 @@ const ShopPage = () => {
     "Tools & Accessories",
   ]);
 
-  const [products] = useState([
-    { id: 1, name: "Crochet Hat", price: "$20", image: "https://placehold.co/150x150?text=Crochet+Hat" },
-    { id: 2, name: "Knitting Scarf", price: "$35", image: "https://placehold.co/150x150?text=Knitting+Scarf" },
-    { id: 3, name: "Wool Yarn Pack", price: "$15", image: "https://placehold.co/150x150?text=Yarn+Pack" },
-    { id: 4, name: "Crochet Amigurumi", price: "$25", image: "https://placehold.co/150x150?text=Amigurumi" },
-    { id: 5, name: "Knitting Needles", price: "$10", image: "https://placehold.co/150x150?text=Knitting+Needles" },
-    { id: 6, name: "Pattern Book", price: "$18", image: "https://placehold.co/150x150?text=Pattern+Book" },
-  ]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products from backend
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get("http://localhost:5002/api/products/all-products");
+      setProducts(res.data.products || res.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  if (loading) return <p className="text-center mt-10">Loading products...</p>;
 
   return (
     <div className="flex min-h-screen bg-[#fffbff] p-6">
@@ -40,22 +53,15 @@ const ShopPage = () => {
       {/* Products Grid */}
       <section className="flex-1">
         <h1 className="text-3xl font-bold text-[#BD8F80] mb-6">Shop Handicrafts</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="bg-[#ebd8d0] p-4 rounded-xl shadow-md hover:shadow-lg transition">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-40 object-cover rounded-lg mb-4"
-              />
-              <h2 className="text-[#BD8F80] font-bold text-lg">{product.name}</h2>
-              <p className="text-[#916556] mt-1">{product.price}</p>
-              <button className="mt-3 w-full bg-[#d3ab9e] text-white py-2 rounded-xl hover:bg-[#BD8F80] transition">
-                Add to Cart
-              </button>
-            </div>
-          ))}
-        </div>
+        {products.length === 0 ? (
+          <p>No products available.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
