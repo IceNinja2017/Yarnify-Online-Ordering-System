@@ -18,6 +18,7 @@ import AboutPage from "./pages/AboutPage.jsx"
 import ContactPage from "./pages/ContactPage.jsx"
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx"
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx"
+import ItemPage from "./pages/ItemPage.jsx"
 
 function App() {
   return (
@@ -84,7 +85,7 @@ function App() {
             <Route path="/contact" element={<ContactPage />}/>
             <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
             <Route path="/reset-password/:token" element={<ResetPasswordPage />}/>
-            <Route path="/item/:id" element={<ContactPage/>}/>
+            <Route path="/item/:id" element={<ItemPage/>}/>
           </Routes>
         </div>
 
