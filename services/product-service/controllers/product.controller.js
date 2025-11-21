@@ -10,39 +10,26 @@ export const addProduct = async (req, res) => {
     try {
         const { name, description, price, stock, category } = req.body;
         let imageData = [];
-        //multer upload logic can be added here
-        if (req.file) {
-            const uploadResult = await uploadToCloudinary(req.file.path, { folder: "products" });
-            imageData.push({
-                url: uploadResult.secure_url,
-                public_id: uploadResult.public_id
-            });
-            await deleteUploadedFile(req.file.path);
-        } else if (req.files && req.files.length > 0) {
+
+        // Handle uploaded files (from multer.array)
+        if (req.files && req.files.length > 0) {
             for (const file of req.files) {
                 const uploadResult = await uploadToCloudinary(file.path, { folder: "products" });
+
                 imageData.push({
                     url: uploadResult.secure_url,
                     public_id: uploadResult.public_id
                 });
+
                 await deleteUploadedFile(file.path);
             }
-        } else if (req.body.image) {
-            // If image info comes directly in body (JSON)
-            imageData.push({
-                url: req.body.image.url,
-                public_id: req.body.image.public_id
-            });
         } else {
-            // Optional: default image
+            // Optional default
             imageData.push({
                 url: "/uploads/default.png",
                 public_id: "default"
             });
         }
-
-        //cloudinary upload logic can be added here in future
-
 
         const newProduct = new Product({
             name,
@@ -55,15 +42,15 @@ export const addProduct = async (req, res) => {
 
         await newProduct.save();
 
-
         res.status(201).json({
             success: true,
-            message: "Product added successfully", 
-            product: newProduct });
+            message: "Product added successfully",
+            product: newProduct
+        });
     } catch (error) {
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
-            message: error.message 
+            message: error.message
         });
     }
 };
@@ -162,43 +149,106 @@ export const searchProducts = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body; 
-        
-        if (updates.stock !== undefined) {
-            updates.isActive = updates.stock > 0;
-        }
-        //multer update logic
-        //cloudinary update logic
+        const updates = req.body;
+        const replaceIndex = req.body.replaceIndex; // optional index to replace
+        const newImages = req.files || [];
 
-        const updatedProduct = await Product.findOneAndUpdate(
-            { _id: id },
-            updates,
-            { new: true, runValidators: true }
-        );
-        if (!updatedProduct) {
-            //multer delete temporary local file if any cloudinary upload is done
-
+        const product = await Product.findById(id);
+        if (!product) {
             return res.status(404).json({
                 success: false,
                 message: "Product not found"
             });
-        } 
-        
-        //cloudinary delete logic can be added here in future
-        //multer delete temporary local file if any cloudinary upload is done
+        }
+
+        // -----------------------------------------
+        // HANDLE STOCK STATUS
+        // -----------------------------------------
+        if (updates.stock !== undefined) {
+            updates.isActive = updates.stock > 0;
+        }
+
+        // -----------------------------------------
+        // IF NEW IMAGES WERE UPLOADED
+        // -----------------------------------------
+        if (newImages.length > 0) {
+
+            // A) PRODUCT HAS LESS THAN 5 IMAGES → APPEND
+            if (product.image.length < 5) {
+
+                const slotsLeft = 5 - product.image.length;
+                const allowedImages = newImages.slice(0, slotsLeft);
+
+                for (const file of allowedImages) {
+                    const uploadResult = await uploadToCloudinary(file.path, { folder: "products" });
+
+                    product.image.push({
+                        url: uploadResult.secure_url,
+                        public_id: uploadResult.public_id
+                    });
+
+                    await deleteUploadedFile(file.path);
+                }
+            }
+
+            // B) PRODUCT ALREADY HAS 5 IMAGES → NEED replaceIndex
+            else {
+                if (replaceIndex === undefined) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Product has 5 images. Provide replaceIndex to overwrite."
+                    });
+                }
+
+                const index = parseInt(replaceIndex);
+                if (isNaN(index) || index < 0 || index > 4) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Invalid replaceIndex. Must be 0–4."
+                    });
+                }
+
+                const oldImage = product.image[index];
+
+                // Delete old image from Cloudinary
+                if (oldImage && oldImage.public_id) {
+                    await deleteFromCloudinary(oldImage.public_id);
+                }
+
+                // Upload the first new image (only 1 allowed when replacing)
+                const file = newImages[0];
+                const uploadResult = await uploadToCloudinary(file.path, { folder: "products" });
+
+                product.image[index] = {
+                    url: uploadResult.secure_url,
+                    public_id: uploadResult.public_id
+                };
+
+                await deleteUploadedFile(file.path);
+            }
+        }
+
+        // -----------------------------------------
+        // APPLY OTHER FIELD UPDATES
+        // -----------------------------------------
+        Object.assign(product, updates);
+
+        await product.save();
 
         res.status(200).json({
             success: true,
-            message: "Product updated successfully",        
-            product: updatedProduct
+            message: "Product updated successfully",
+            product
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
             message: error.message
         });
-    }           
-}       
+    }
+};
+     
 
 //delete product from database
 export const deleteProduct = async (req, res) => {

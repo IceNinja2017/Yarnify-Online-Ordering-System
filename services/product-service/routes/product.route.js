@@ -18,14 +18,13 @@ router.get("/category/:category", getProductsByCategory)
 router.get("/search/:query", searchProducts);
 
 //Add Product to Database
-router.post("/product",  uploadSingleFile('image'), addProduct);
 router.post("/product",  uploadMultipleFiles('image', 5), addProduct);
 
 //Delete Product from Database
 router.delete("/product/:id", deleteProduct);
 
 //Update Product in Database
-router.put("/product/:id", updateProduct);
+router.put("/product/:id", uploadMultipleFiles("image", 5), updateProduct);
 
 
 
