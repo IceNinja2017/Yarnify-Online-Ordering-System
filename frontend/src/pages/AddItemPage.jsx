@@ -15,14 +15,30 @@ const AddItemPage = () => {
   const [stock, setStock] = useState("");
   const [image, setImage] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [imageWarning, setImageWarning] = useState("");
 
-  const handleFileChange = (e) => {
-    setImage([...e.target.files]);
+ const handleFileChange = (e) => {
+    const files = [...e.target.files];
+
+    if (files.length > 5) {
+      setImageWarning("You can only upload up to 5 images.");
+      setImage([]); // reset selection
+    } else {
+      setImageWarning(""); // clear warning
+      setImage(files);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // --- check for max 5 images ---
+    if (image.length > 5) {
+      toast.error("You can only upload up to 5 images.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -48,7 +64,8 @@ const AddItemPage = () => {
       setPrice("");
       setCategory(categories[0]);
       setStock("");
-      setImages([]);
+      setImage([]); // <-- fixed typo
+
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to add product.");
@@ -148,7 +165,11 @@ const AddItemPage = () => {
             {image.length > 0 && (
               <p className="mt-1 text-sm text-[#916556]">{image.length} file(s) selected</p>
             )}
+            {imageWarning && (
+              <p className="mt-1 text-sm text-red-600 font-medium">{imageWarning}</p>
+            )}
           </div>
+          
 
           <motion.button
             type="submit"
