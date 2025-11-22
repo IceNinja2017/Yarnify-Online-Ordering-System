@@ -257,7 +257,7 @@ export const cancelPaypalOrder = async (req, res) => {
       await order.save();
     }
 
-    res.status(200).json({ message: "Order marked as canceled", order });
+    res.status(200).json({ message: "Order marked as Canceled", order });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to cancel order" });
