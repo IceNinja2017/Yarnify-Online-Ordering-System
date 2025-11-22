@@ -101,7 +101,7 @@ function App() {
           </Routes>
         </div>
 
-        <div className="relative z-10">
+        <div className="relative">
           <Footer />
         </div>
       </AuthProvider>

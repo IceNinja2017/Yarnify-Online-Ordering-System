@@ -1,6 +1,6 @@
 import Product from "../models/product.model.js";
 import { deleteUploadedFile } from "../middleware/fileHandling.js";
-import { uploadToCloudinary } from "../middleware/cloudinary.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../middleware/cloudinary.js";
 
 export const dummyFunction = (req, res) => {
     res.status(200).json({ message: "Dummy function works!" });
@@ -254,24 +254,43 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const deletedProduct = await Product.findByIdAndDelete(id);
+        const product = await Product.findById(id);
 
-        if (!deletedProduct) {                                              
+        if (!product) {
             return res.status(404).json({
                 success: false,
                 message: "Product not found"
             });
         }
+
+        // Delete associated images from Cloudinary
+        if (product.image && product.image.length > 0) {
+            for (const img of product.image) {
+                if (img.public_id) {
+                    try {
+                        await deleteFromCloudinary(img.public_id);
+                    } catch (err) {
+                        console.error(`Failed to delete image ${img.public_id} from Cloudinary`, err);
+                        // continue deleting other images even if one fails
+                    }
+                }
+            }
+        }
+
+        // Delete product from MongoDB
+        await product.deleteOne();
+
         res.status(200).json({
             success: true,
             message: "Product deleted successfully",
-            product: deletedProduct
+            product
         });
-    }
-    catch (error) {
+
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
             success: false,
             message: error.message
         });
     }
-}
+};
