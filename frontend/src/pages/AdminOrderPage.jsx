@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
+
 import { Loader2 } from "lucide-react";
 
 const AdminOrderPage = () => {
@@ -18,7 +18,7 @@ const AdminOrderPage = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5002/api/orders/all", { withCredentials: true })
+      .get("http://localhost:5001/api/payment/orders", { withCredentials: true })
       .then((res) => {
         setOrders(res.data.orders || []);
         setLoading(false);
@@ -30,7 +30,7 @@ const AdminOrderPage = () => {
     setUpdating(orderId);
     try {
       await axios.put(
-        `http://localhost:5002/api/orders/update-status/${orderId}`,
+        `http://localhost:5001/api/payment/update/${orderId}`,
         { status: newStatus },
         { withCredentials: true }
       );
@@ -61,12 +61,8 @@ const AdminOrderPage = () => {
 
       <div className="grid grid-cols-1 gap-4">
         {orders.map((order) => (
-          <Card
-            key={order._id}
-            className="rounded-2xl shadow p-4"
-            style={{ backgroundColor: colors.card }}
-          >
-            <CardContent>
+          <div className="rounded-2xl shadow p-4" style={{ backgroundColor: colors.card }} >
+            <div className="p-2">
               <div className="space-y-3">
                 <p><strong>Order ID:</strong> {order._id}</p>
                 <p><strong>User:</strong> {order.user?.email || "Unknown"}</p>
@@ -89,7 +85,7 @@ const AdminOrderPage = () => {
                 <div className="flex gap-2 mt-4">
                   {["Pending", "Processing", "Completed", "Cancelled"].map(
                     (s) => (
-                      <Button
+                      <button
                         key={s}
                         disabled={updating === order._id}
                         onClick={() => updateStatus(order._id, s)}
@@ -105,13 +101,13 @@ const AdminOrderPage = () => {
                         ) : (
                           s
                         )}
-                      </Button>
+                      </button>
                     )
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
     </div>
