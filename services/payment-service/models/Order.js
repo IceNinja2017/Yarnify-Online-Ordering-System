@@ -16,9 +16,18 @@ const orderSchema = new mongoose.Schema({
     enum: ["COD", "PayPal"], 
     default: "COD" 
   },
+  paypalOrderId: {
+    type: String,
+    default: null
+  },
+  paymentStatus: {
+    type: String, 
+    enum: ["Paid", "Unpaid", "Canceled"], 
+    default: "Unpaid" 
+  },
   status: { 
     type: String, 
-    enum: ["Pending", "Shipped", "Completed"], 
+    enum: ["Pending", "Shipped", "Completed", "Canceled"], 
     default: "Pending" 
   },
   createdAt: { 

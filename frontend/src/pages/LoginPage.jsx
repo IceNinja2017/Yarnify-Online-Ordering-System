@@ -8,7 +8,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const LoginPage = () => {
-    const { setIsLoggedIn } = useContext(AuthContext);
+    const { setIsLoggedIn, fetchMe } = useContext(AuthContext);
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,7 +28,8 @@ const LoginPage = () => {
             });
             console.log("Login success:", response.data);
             setIsLoggedIn(true);
-            navigate("/dashboard");
+            fetchMe();
+            navigate("/shop");
         } catch (error) {
             console.error("Login failed:", error.response?.data || error.message);
             alert(error.response?.data?.message || "Login failed");
@@ -86,6 +87,11 @@ const LoginPage = () => {
                         Login
                     </motion.button>
                 </form>
+                <div className='mt-4 text-center'>
+                    <Link to={"/forgot-password"} className='text-sm text-[#aa6049] hover:underline'>
+                        Forgot Password?
+                    </Link>
+                </div>
             </div>
             <div className='px-8 py-4 bg-[#d4a394] bg-opacity-50 flex justify-center'>
                 <p className='text-sm text-[#f5eae8]'>

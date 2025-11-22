@@ -10,6 +10,20 @@ import { AuthProvider } from "./context/AuthContext.jsx"
 import PaymentReturnPage from "./pages/PaymentReturnPage.jsx"
 import EmailVerificationPage from "./pages/EmailVerificationPage.jsx"
 import { Toaster } from "react-hot-toast"
+import ShopPage from "./pages/ShopPage.jsx"
+import OrdersPage from "./pages/OrdersPage.jsx"
+import ProfilePage from "./pages/ProfilePage.jsx"
+import PaymentCancelPage from "./pages/PaymentCancelPage.jsx"
+import AboutPage from "./pages/AboutPage.jsx"
+import ContactPage from "./pages/ContactPage.jsx"
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx"
+import ResetPasswordPage from "./pages/ResetPasswordPage.jsx"
+import ItemPage from "./pages/ItemPage.jsx"
+import CheckoutPage from "./pages/CheckoutPage.jsx"
+import AddItemPage from "./pages/AddItemPage.jsx"
+import AdminOrderPage from "./pages/AdminOrderPage.jsx"
+import InventoryPage from "./pages/InventoryPage.jsx"
+import AdminRoute from "./context/AdminRoutes.jsx"
 
 function App() {
   return (
@@ -58,9 +72,7 @@ function App() {
       <AuthProvider>
         <Toaster position="top-center" reverseOrder={false} />
         {/* Navbar should be above background */}
-        <div className="relative z-10">
-          <Navbar />
-        </div>
+        <Navbar />
 
         {/* Page content */}
         <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-4rem)]">
@@ -69,11 +81,27 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/verify-email" element={<EmailVerificationPage />} />
             <Route path="/register" element={<RegistrationPage />} />
-            <Route path="/payment/return" element={<PaymentReturnPage/>} />
+            <Route path="/payment/return" element={<PaymentReturnPage />} />
+            <Route path="/payment/cancel" element={<PaymentCancelPage />} />
+            <Route path="/shop" element={<ShopPage />}/>
+            <Route path="/orders" element={<OrdersPage />}/>
+            <Route path="/profile" element={<ProfilePage />}/>
+            <Route path="/about" element={<AboutPage />}/>
+            <Route path="/contact" element={<ContactPage />}/>
+            <Route path="/forgot-password" element={<ForgotPasswordPage />}/>
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />}/>
+            <Route path="/item/:id" element={<ItemPage/>}/>
+            <Route path="/check-out/:id" element={<CheckoutPage/>}/>
+
+            <Route element={<AdminRoute />}>
+              <Route path="/add-item" element={<AddItemPage/>}/>
+              <Route path="/admin-order" element={<AdminOrderPage/>}/>
+              <Route path="/inventory" element={<InventoryPage/>}/>
+            </Route>
           </Routes>
         </div>
 
-        <div className="relative z-10">
+        <div className="relative">
           <Footer />
         </div>
       </AuthProvider>

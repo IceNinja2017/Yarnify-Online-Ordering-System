@@ -95,70 +95,78 @@ export const newOrderCOD = async (req, res) => {
 export const newOrderPaypal = async (req, res) => {
   try {
     const { userId } = req.body;
-    const cart = await Cart.findOne({ userId: userId });
-    console.log(cart);
+    const cart = await Cart.findOne({ userId });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
     if (cart.items.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
     const accessToken = await getAccessTokenFromPayPal();
-    console.log("PayPal Access Token:", accessToken);
-    
-    //create papal order
+
+    // Create PayPal order
     const response = await axios.post(
-  `${process.env.PAYPAL_API_BASE}/v2/checkout/orders`,
-    {
-      intent: "CAPTURE",
-      purchase_units: [
-        {
-          amount: {
-            currency_code: "PHP",
-            value: cart.totalAmount.toFixed(2)
-          }
-        }
-      ],
-      payment_source: {
-        paypal: {
-          experience_context: {
-            payment_method_preference: "IMMEDIATE_PAYMENT_REQUIRED",
-            payment_method_selected: "PAYPAL",
-            brand_name: "Yarnify Online Ordering System",
-            locale: "en-US",
-            landing_page: "BILLING",
-            user_action: "PAY_NOW",
-            return_url: `${process.env.PAYPAL_REDIRECT_URL_BASE}/return`,
-            cancel_url: `${process.env.PAYPAL_REDIRECT_URL_BASE}/cancel`
-          }
-        }
+      `${process.env.PAYPAL_API_BASE}/v2/checkout/orders`,
+      {
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "PHP",
+              value: cart.totalAmount.toFixed(2),
+            },
+          },
+        ],
+        payment_source: {
+          paypal: {
+            experience_context: {
+              payment_method_preference: "IMMEDIATE_PAYMENT_REQUIRED",
+              payment_method_selected: "PAYPAL",
+              brand_name: "Yarnify Online Ordering System",
+              locale: "en-US",
+              landing_page: "BILLING",
+              user_action: "PAY_NOW",
+              return_url: `${process.env.PAYPAL_REDIRECT_URL_BASE}/return`,
+              cancel_url: `${process.env.PAYPAL_REDIRECT_URL_BASE}/cancel`,
+            },
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
       }
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json"
-      }
-    }
-  );
+    );
 
+    // Extract approval URL
+    const approvalUrl = response.data.links.find(link => link.rel === "payer-action")?.href;
+    if (!approvalUrl) return res.status(500).json({ message: "No approval URL returned by PayPal" });
 
-    console.log("PayPal Order Response:", response.data);
-
+    // Save order in database including PayPal order ID
     const newOrder = new Order({
       userId,
       items: cart.items,
       totalAmount: cart.totalAmount,
       paymentMethod: "PayPal",
+      paypalOrderId: response.data.id, // <-- Save PayPal order ID here
+      paymentStatus: "Unpaid",
     });
     await newOrder.save();
-    cart.items = []
-    cart.totalAmount = 0
-    await cart.save()
-    res.status(200).json({ message: "Order placed (PayPal)", order: newOrder });
+
+    // Clear cart
+    cart.items = [];
+    cart.totalAmount = 0;
+    await cart.save();
+
+    // Return approval URL to frontend
+    res.status(200).json({ approvalUrl, order: newOrder });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 //getAllOrders
 export const getAllOrders = async (req, res) => {
@@ -194,27 +202,64 @@ export const getOrdersByStatus = async (req, res) => {
 //capture paypal order
 export const capturePaypalOrder = async (req, res) => {
   try {
-    const { orderId, payerId } = req.body;
+    const { orderId, payerId } = req.body; // PayPal order ID
     const accessToken = await getAccessTokenFromPayPal();
 
-    const response = await axios.post(  
+    // Capture payment with PayPal
+    const response = await axios.post(
       `${process.env.PAYPAL_API_BASE}/v2/checkout/orders/${orderId}/capture`,
       {},
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
+
     console.log("PayPal Capture Response:", response.data);
 
-    // Update order status in your database
-    //no 
+    // Find order by PayPal order ID
+    const order = await Order.findOne({ paypalOrderId: orderId });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-    res.status(200).json(response.data);
+    // Update payment status
+    order.paymentStatus = "Paid";
+    await order.save();
+
+    res.status(200).json({
+      message: "Payment captured successfully and order marked as Paid",
+      order,
+      paypalResponse: response.data,
+    });
   } catch (error) {
-    console.error('Error capturing PayPal order:', error.response ? error.response.data : error.message);
-    res.status(500).json({ message: 'Error capturing PayPal order' });
+    console.error(
+      "Error capturing PayPal order:",
+      error.response ? error.response.data : error.message
+    );
+    res.status(500).json({ message: "Error capturing PayPal order" });
+  }
+};
+
+export const cancelPaypalOrder = async (req, res) => {
+  try {
+    const { paypalOrderId } = req.body;
+
+    const order = await Order.findOne({ paypalOrderId });
+    console.log(order.data)
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (order.paymentStatus === "Unpaid") {
+      order.paymentStatus = "Canceled";
+      order.status = "Canceled";
+      await order.save();
+    }
+
+    res.status(200).json({ message: "Order marked as Canceled", order });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to cancel order" });
   }
 };
