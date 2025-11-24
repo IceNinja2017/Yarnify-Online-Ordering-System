@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken"
+import dotenvFlow from "dotenv-flow";
+dotenvFlow.config();
 
 export const generateTokenAndSetCookie = (res, userId) => {
     //token creation
