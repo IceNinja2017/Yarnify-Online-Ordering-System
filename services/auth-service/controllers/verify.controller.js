@@ -13,33 +13,34 @@ const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
 loadEnv(envFileURL, dotenvFlow);
 
 export const me = async (req, res) => {
-    const token = req.cookies.token;
+    // Look for Authorization header
+    const authHeader = req.headers["authorization"];
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 
     if (!token) {
-        return res.status(401).json({
-            loggedIn: false,
-        });
+        return res.status(401).json({ loggedIn: false });
     }
 
     try {
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // make sure JWT_SECRET matches what you used to sign
-        const userId = decoded.userId; // assuming your token payload has { id: user._id }
-        // Optionally, fetch full user info if needed
-        const user = await User.findById(userId).select("_id username email address role profileImage"); // select fields you want to return
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId)
+            .select("_id username email address role profileImage");
+
+        if (!user) {
+            return res.status(401).json({ loggedIn: false });
+        }
 
         return res.status(200).json({
             loggedIn: true,
-            user: user, // or { _id: user._id } if you just want ID
+            user
         });
-        
+
     } catch (err) {
-        console.error(err);
-        return res.status(401).json({
-            loggedIn: false,
-        });
+        console.error("ME() error:", err);
+        return res.status(401).json({ loggedIn: false });
     }
 };
+
 
 
 export const checkAuth = async (req, res) => {

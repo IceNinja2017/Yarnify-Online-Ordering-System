@@ -49,6 +49,7 @@ const RegistrationPage = () => {
                 withCredentials: true
             });
             console.log("Registration success:", response.data);
+            localStorage.setItem("token", response.data.token);
             navigate("/verify-email");
 
         } catch (error) {

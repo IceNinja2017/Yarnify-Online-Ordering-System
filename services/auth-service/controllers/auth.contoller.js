@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { User } from "../models/user.model.js";
-import { generateTokenAndSetCookie } from "../middleware/generateTokenAndSetCookie.js";
-import { sendVerificationEmain, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from "../gmail/emails.js";
+import { generateToken } from "../middleware/generateTokenAndSetCookie.js";
+import { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordEmail, sendResetSuccessEmail } from "../brevo/emails.js";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 
@@ -70,12 +70,8 @@ export const register = async (req, res) => {
 
         await newUser.save();
 
-        //jwt token
-        generateTokenAndSetCookie(res, newUser._id);
-        await sendVerificationEmain(newUser.email, newUser.verificationToken);
-
-        // TODO: send verification email. Replace with your mailer.
-        // sendVerificationEmail(newUser.email, verificationToken);
+        // JWT token
+        const token = generateToken(newUser._id);
 
         // Sanitize response (remove sensitive fields)
         const userObj = newUser.toObject();
@@ -88,7 +84,8 @@ export const register = async (req, res) => {
         return res.status(201).json({
             sucess: true,
             message: "Registration successful. Check your email to verify your account.",
-            user: userObj
+            user: userObj,
+            token
         });
     } catch (err) {
         // handle duplicate key error that slipped through (extra safety)
@@ -121,7 +118,7 @@ export const login = async (req, res) => {
             });
         }
 
-        generateTokenAndSetCookie(res, user._id);
+        const token = generateToken(user._id);
 
         user.lastLogin = new Date();
         await user.save();
@@ -129,6 +126,7 @@ export const login = async (req, res) => {
         res.status(200).json({
                 success: true,
                 message: "Logged in Sucessfully",
+                token,
                 user: {
                     ...user._doc,
                     password: undefined,
@@ -136,7 +134,7 @@ export const login = async (req, res) => {
                     passwordResetExpiresAt: undefined,
                     verificationToken: undefined,
                     verificationTokenExpiresAt: undefined,
-                },
+                }
             });
 
     } catch (error) {
@@ -301,8 +299,8 @@ export const resetPassword = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const updates = req.body || {};
-        const token = req.cookies.token;
-
+        const token = req.headers.authorization?.split(" ")[1];
+        
         if (!token) return res.status(401).json({ loggedIn: false });
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);

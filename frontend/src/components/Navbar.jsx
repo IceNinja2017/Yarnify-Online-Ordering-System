@@ -19,6 +19,7 @@ const Navbar = () => {
         });
 
         // refresh context after logout
+        localStorage.removeItem("token");
         await fetchMe();
 
         navigate("/");

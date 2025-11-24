@@ -28,6 +28,7 @@ const LoginPage = () => {
             });
             console.log("Login success:", response.data);
             setIsLoggedIn(true);
+            localStorage.setItem("token", response.data.token);
             fetchMe();
             navigate("/shop");
         } catch (error) {
