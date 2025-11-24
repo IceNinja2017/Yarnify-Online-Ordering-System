@@ -8,6 +8,7 @@ const GmailPass = process.env.GMAIL_PASS
 
 export const transporter = nodemailer.createTransport({
     service: "gmail",
+    host: "smtp.gmail.com",
     port: 465,
     secure: process.env.NODE_ENV === "production",
     auth: {
