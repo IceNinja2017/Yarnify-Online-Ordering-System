@@ -39,7 +39,7 @@ const UpdateModal = ({ item, onClose, refreshInventory }) => {
       if (form.imageFile) formData.append("imageFile", form.imageFile);
 
       const res = await axios.put(
-        `http://localhost:5002/api/products/product/${item._id}`,
+        `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/product/${item._id}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

@@ -15,7 +15,7 @@ export default function ItemPage() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/auth/me", {
+                const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
                     withCredentials: true,
                 });
                 setUserId(res.data.user._id);
@@ -30,7 +30,7 @@ export default function ItemPage() {
     useEffect(() => {
         const fetchItem = async () => {
             try {
-                const res = await axios.get(`http://localhost:5002/api/products/get-product/${id}`);
+                const res = await axios.get(`${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/get-product/${id}`);
                 setItem(res.data.product);
             } catch (err) {
                 toast.error("Failed to load item");
@@ -46,7 +46,7 @@ export default function ItemPage() {
 
         try {
             await axios.post(
-                "http://localhost:5001/api/payment/add-to-cart",
+                `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/add-to-cart`,
                 {
                     userId,
                     item: {

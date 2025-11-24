@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   // fetchMe function: call this to refresh auth state
   const fetchMe = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/me", { withCredentials: true });
+      const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { withCredentials: true });
       setIsLoggedIn(res.data.loggedIn);
       setProfileImage(res.data.user.profileImage.url);
       if (res.data.loggedIn && res.data.user) {

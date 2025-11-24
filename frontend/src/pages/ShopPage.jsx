@@ -19,16 +19,19 @@ const ShopPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchProducts = async (category, query) => {
+    console.log(import.meta.env.VITE_PRODUCT_SERVICE_URL);
+    console.log(import.meta.env.VITE_PAYMENT_SERVICE_URL);
+    console.log(import.meta.env.VITE_AUTH_SERVICE_URL);
     setLoading(true);
     try {
-      let endpoint = "http://localhost:5002/api/products/all-products";
+      let endpoint = `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/all-products`;
 
       if (query.trim()) {
-        endpoint = `http://localhost:5002/api/products/search/${encodeURIComponent(
+        endpoint = `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/search/${encodeURIComponent(
           query
         )}`;
       } else if (category !== "All") {
-        endpoint = `http://localhost:5002/api/products/category/${encodeURIComponent(
+        endpoint = `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/category/${encodeURIComponent(
           category
         )}`;
       }

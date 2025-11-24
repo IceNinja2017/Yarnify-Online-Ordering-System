@@ -19,7 +19,7 @@ const PaymentCanceledPage = () => {
 
     // Call backend to mark order as canceled
     axios.post(
-      "http://localhost:5001/api/payment/cancel-paypal-order",
+      `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/cancel-paypal-order`,
       { paypalOrderId },
       { withCredentials: true }
     )

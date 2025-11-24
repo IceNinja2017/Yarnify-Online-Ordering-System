@@ -17,7 +17,7 @@ const CartBubble = ({ onClose, userId }) => {
     const fetchCart = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:5001/api/payment/cart/${userId}`,
+          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/cart/${userId}`,
           { withCredentials: true }
         );
 
@@ -28,7 +28,7 @@ const CartBubble = ({ onClose, userId }) => {
           items.map(async (item) => {
             try {
               const res = await axios.get(
-                `http://localhost:5002/api/products/get-product/${item.productId}`
+                `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/get-product/${item.productId}`
               );
 
               const product = res.data.product;
@@ -67,7 +67,7 @@ const CartBubble = ({ onClose, userId }) => {
     if (newQuantity < 1) return;
     try {
       await axios.put(
-        `http://localhost:5001/api/payment/update-item-quantity/${userId}/${productId}`,
+        `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/update-item-quantity/${userId}/${productId}`,
         { quantity: newQuantity },
         { withCredentials: true }
       );

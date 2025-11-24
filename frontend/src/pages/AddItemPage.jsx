@@ -51,7 +51,7 @@ const AddItemPage = () => {
       image.forEach((file) => formData.append("image", file));
 
       await axios.post(
-        "http://localhost:5002/api/products/product",
+        `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/product`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
       );

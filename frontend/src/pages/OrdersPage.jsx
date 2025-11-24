@@ -16,7 +16,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
           withCredentials: true,
         });
         setUser(res.data.user);
@@ -34,7 +34,7 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5001/api/payment/orders/${user._id}`
+          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/orders/${user._id}`
         );
         const allOrders = res.data; // this should be an array of orders from your backend
 
