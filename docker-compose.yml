@@ -9,7 +9,9 @@ services:
       - "5001:5001"
     environment:
       MONGO_URL: "mongodb+srv://stewiegriffen2017_db_user:Ne9QexVaKMbJUSyM@yarnifywebpagecluster.bx7qzf8.mongodb.net/yarnifydb?retryWrites=true&w=majority&appName=yarnifyWebpageCluster"
-  
+    env_file:
+      - ./services/auth-service/.env
+
   product-service:
     build: ./services/product-service
     container_name: product-service
@@ -18,6 +20,8 @@ services:
       - "5002:5002"
     environment:
       MONGO_URL: "mongodb+srv://stewiegriffen2017_db_user:Ne9QexVaKMbJUSyM@yarnifywebpagecluster.bx7qzf8.mongodb.net/yarnifydb?retryWrites=true&w=majority&appName=yarnifyWebpageCluster"
+    env_file:
+      - ./services/product-service/.env
 
   payment-service:
     build: ./services/payment-service
@@ -27,6 +31,8 @@ services:
       - "5003:5003"
     environment:
       MONGO_URL: "mongodb+srv://stewiegriffen2017_db_user:Ne9QexVaKMbJUSyM@yarnifywebpagecluster.bx7qzf8.mongodb.net/yarnifydb?retryWrites=true&w=majority&appName=yarnifyWebpageCluster"
+    env_file:
+      - ./services/payment-service/.env
 
   frontend:
     build: ./frontend
@@ -38,3 +44,5 @@ services:
       - auth-service
       - product-service
       - payment-service
+    env_file:
+      - ./frontend/.env
