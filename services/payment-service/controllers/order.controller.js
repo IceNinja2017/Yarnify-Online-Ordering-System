@@ -3,16 +3,11 @@ import Cart from "../models/Cart.js";
 import axios from "axios";
 
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../../config/loadEnv.js";
-import { fileURLToPath, pathToFileURL } from "url";
-import path from "path";
-import { json } from "stream/consumers";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
+dotenvFlow.config();
 
-loadEnv(envFileURL, dotenvFlow);
+
+
 
 const getAccessTokenFromPayPal = async () => {
   const clientId = process.env.PAYPAL_CLIENT_ID;

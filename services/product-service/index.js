@@ -1,6 +1,5 @@
 import express from "express";
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../config/loadEnv.js";
 import { connectDB } from "../config/db.js";
 import mongoose from "mongoose";
 import path from "path";
@@ -9,8 +8,7 @@ import cors from "cors";
 
 // Import your routes
 import productRoutes from "./routes/product.route.js";
-
-loadEnv(import.meta.url, dotenvFlow);
+dotenvFlow.config();
 
 const app = express();
 const PORT = process.env.ProductService_PORT;
