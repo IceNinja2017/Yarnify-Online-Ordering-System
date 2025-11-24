@@ -1,6 +1,6 @@
 import express from "express";
 import dotenvFlow from "dotenv-flow";
-import { connectDB } from "../config/db.js";
+import { connectDB } from "./config/db.js";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";

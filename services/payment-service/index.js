@@ -1,7 +1,7 @@
 import cors from "cors";
 import express from "express";
 import dotenvFlow from "dotenv-flow";
-import { connectDB } from "../config/db.js";
+import { connectDB } from "./config/db.js";
 import mongoose from "mongoose";
 import paymentRoutes from "./routes/payment.route.js";
 import cookieParser from "cookie-parser";
