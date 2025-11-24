@@ -12,7 +12,7 @@ const InventoryPage = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        "http://localhost:5002/api/products/all-products",
+        `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/all-products`,
         { withCredentials: true }
       );
       setItems(res.data.products || []);
@@ -29,7 +29,7 @@ const InventoryPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5002/api/products/product/${id}`);
+      await axios.delete(`${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/product/${id}`);
       toast.success("Item deleted");
       fetchItems(); // Refresh inventory after delete
     } catch (err) {

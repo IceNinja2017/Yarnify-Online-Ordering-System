@@ -23,7 +23,7 @@ const LoginPage = () => {
         console.log(JSON.stringify(data))
 
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/login", data, {
+            const response = await axios.post(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/login`, data, {
                 withCredentials: true
             });
             console.log("Login success:", response.data);

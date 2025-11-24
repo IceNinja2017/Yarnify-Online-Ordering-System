@@ -20,7 +20,7 @@ const PaymentReturnPage = () => {
     // Call backend to capture PayPal payment
     axios
       .post(
-        "http://localhost:5001/api/payment/capture-paypal-order",
+        `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/capture-paypal-order`,
         { orderId, payerId },
         { withCredentials: true }
       )

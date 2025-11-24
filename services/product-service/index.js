@@ -1,7 +1,6 @@
 import express from "express";
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../config/loadEnv.js";
-import { connectDB } from "../config/db.js";
+import { connectDB } from "./config/db.js";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -9,8 +8,7 @@ import cors from "cors";
 
 // Import your routes
 import productRoutes from "./routes/product.route.js";
-
-loadEnv(import.meta.url, dotenvFlow);
+dotenvFlow.config();
 
 const app = express();
 const PORT = process.env.ProductService_PORT;
@@ -20,6 +18,7 @@ const SERVICE_NAME = process.env.SERVICE_NAME;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.set("trust proxy", 1);
 
 app.use(cors({
     origin: process.env.FRONTEND_BASE_URL,

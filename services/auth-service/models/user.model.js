@@ -1,4 +1,3 @@
-import { url } from "inspector";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({

@@ -45,7 +45,7 @@ const RegistrationPage = () => {
         };
 
         try {
-            const response = await axios.post("http://localhost:5000/api/auth/register", data, {
+            const response = await axios.post(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/register`, data, {
                 withCredentials: true
             });
             console.log("Registration success:", response.data);

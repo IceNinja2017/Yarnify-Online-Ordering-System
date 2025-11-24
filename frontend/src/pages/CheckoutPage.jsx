@@ -15,7 +15,7 @@ const CheckoutPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
           withCredentials: true,
         });
         setUser(res.data.user);
@@ -33,7 +33,7 @@ const CheckoutPage = () => {
 
       try {
         const res = await axios.get(
-          `http://localhost:5001/api/payment/cart/${user._id}`,
+          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/cart/${user._id}`,
           { withCredentials: true }
         );
 
@@ -43,7 +43,7 @@ const CheckoutPage = () => {
           items.map(async (item) => {
             try {
               const prodRes = await axios.get(
-                `http://localhost:5002/api/products/get-product/${item.productId}`
+                `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/get-product/${item.productId}`
               );
               return {
                 ...item,
@@ -81,7 +81,7 @@ const CheckoutPage = () => {
     try {
       if (paymentMethod === "COD") {
         await axios.post(
-          "http://localhost:5001/api/payment/cod",
+          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/cod`,
           { userId: user._id },
           { withCredentials: true }
         );
@@ -90,7 +90,7 @@ const CheckoutPage = () => {
 
       } else if (paymentMethod === "PayPal") {
         const res = await axios.post(
-          "http://localhost:5001/api/payment/paypal",
+          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/paypal`,
           { userId: user._id },
           { withCredentials: true }
         );

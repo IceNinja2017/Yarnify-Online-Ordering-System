@@ -43,7 +43,7 @@ const EmailVerificationPage = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/auth/verify-email",
+                `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/verify-email`,
                 { code: verificationCode },
                 { withCredentials: true }
             );

@@ -7,35 +7,27 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../../config/loadEnv.js";
-import { fileURLToPath, pathToFileURL } from "url";
-import path from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
-
-loadEnv(envFileURL, dotenvFlow);
+dotenvFlow.config();
 
 export const register = async (req, res) => {
     try {
-        const { username, email, password, address} = req.body;
+        const { username, email, password, address } = req.body;
 
         // required field checks
         if (!username || !email || !password) {
             return res.status(400).json({ message: "username, email and password are required" });
         }
 
-        // Address is an object with required street, city, country
         if (!address || typeof address !== "object") {
             return res.status(400).json({ message: "address is required and must be an object" });
         }
+
         const { street, city, country } = address;
         if (!street || !city || !country) {
             return res.status(400).json({ message: "address.street, address.city, and address.country are required" });
         }
 
-        // Check duplicates (email or username)
+        // Check duplicates
         const existing = await User.findOne({
             $or: [{ email: email.toLowerCase() }, { username }]
         });
@@ -49,20 +41,29 @@ export const register = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create verification token (for email verification flow)
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); //crypto.randomBytes(32).toString("hex");
-        const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+        // Create verification token
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+        // **Send verification email first**
+        try {
+            await sendVerificationEmail(email.toLowerCase(), verificationToken);
+        } catch (emailErr) {
+            console.error("Email send failed:", emailErr);
+            return res.status(500).json({ message: "Failed to send verification email" });
+        }
+
+        // Only create and save user after email succeeds
         const newUser = new User({
             username,
             email: email.toLowerCase(),
             password: hashedPassword,
             address: {
-                street: address.street,
-                city: address.city,
+                street,
+                city,
                 state: address.state || null,
                 postalCode: address.postalCode || null,
-                country: address.country
+                country
             },
             verificationToken,
             verificationTokenExpiresAt
@@ -82,13 +83,13 @@ export const register = async (req, res) => {
         delete userObj.resetPasswordExpiresAt;
 
         return res.status(201).json({
-            sucess: true,
+            success: true,
             message: "Registration successful. Check your email to verify your account.",
             user: userObj,
             token
         });
+
     } catch (err) {
-        // handle duplicate key error that slipped through (extra safety)
         if (err?.code === 11000) {
             const dupKey = Object.keys(err.keyPattern || {}).join(", ");
             return res.status(409).json({ message: `Duplicate key: ${dupKey}` });
@@ -172,11 +173,11 @@ export const verifyEmail = async (req, res) => {
 
         await user.save();
 
-
-        const PaymentService_PORT = process.env.PaymentService_PORT || 6000;
+        
+        const PaymentService_BaseURL = process.env.PaymentService_BaseURL || "http://localhost";
         // Communicate with Payment service to create a cart for the new user
         try {
-            const paymentRes = await axios.post(`http://localhost:${PaymentService_PORT}/api/payment/create-new-cart/${user._id}`);
+            const paymentRes = await axios.post(`${PaymentService_BaseURL}/api/payment/create-new-cart/${user._id}`);
             console.log(`Payment service responded with status: ${paymentRes.status}`);
         } catch (error) {
             console.error("Error communicating with Payment service:", err.message);

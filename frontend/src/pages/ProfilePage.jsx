@@ -20,7 +20,7 @@ const ProfilePage = () => {
   useEffect(() => {
     // fetch current user info
     axios
-      .get("http://localhost:5000/api/auth/me", { withCredentials: true })
+      .get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { withCredentials: true })
       .then((res) => {
         const userData = res.data.user;
         setUser(userData);
@@ -47,7 +47,7 @@ const ProfilePage = () => {
     e.preventDefault();
     try {
       const res = await axios.patch(
-        "http://localhost:5000/api/auth/update-profile",
+        `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/update-profile`,
         formData,
         { withCredentials: true }
       );

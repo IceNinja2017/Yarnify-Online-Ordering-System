@@ -1,18 +1,18 @@
 import cors from "cors";
 import express from "express";
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../config/loadEnv.js";
-import { connectDB } from "../config/db.js";
+import { connectDB } from "./config/db.js";
 import mongoose from "mongoose";
 import paymentRoutes from "./routes/payment.route.js";
 import cookieParser from "cookie-parser";
 
-loadEnv(import.meta.url, dotenvFlow);
+dotenvFlow.config();
 
 const app = express();
 const PORT = process.env.PaymentService_PORT;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
+app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(cors({
     origin: process.env.FRONTEND_BASE_URL,

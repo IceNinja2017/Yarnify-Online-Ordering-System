@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:all": "concurrently -n Frontend,Auth,Product,Payment -c cyan,red,green,blue \"cd frontend && npm run dev\" \"cd services/auth-service && npm run dev\" \"cd services/product-service && npm run dev\" \"cd services/payment-service && npm run dev\""
+    "dev:all": "concurrently -n Frontend,Auth,Product,Payment -c cyan,red,green,blue \"cd frontend && npm run dev\" \"cd services/auth-service && npm run dev\" \"cd services/product-service && npm run dev\" \"cd services/payment-service && npm run dev\"",
+    "start:all": "concurrently -n Frontend,Auth,Product,Payment -c cyan,red,green,blue \"serve -s frontend/dist\" \"cd services/auth-service && npm start\" \"cd services/product-service && npm start\" \"cd services/payment-service && npm start\""
   },
   "type": "module",
   "keywords": [],

@@ -2,18 +2,7 @@ import Cart from "../models/Cart.js";
 import axios from "axios";
 
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../../config/loadEnv.js";
-import { fileURLToPath, pathToFileURL } from "url";
-import path from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
-
-loadEnv(envFileURL, dotenvFlow);
-
-const AuthPort = process.env.AuthenticationService_PORT
-const ProductPort = process.env.ProductService_PORT
+dotenvFlow.config();
 
 export const addToCart = async (req, res) => {
   try {
@@ -22,7 +11,7 @@ export const addToCart = async (req, res) => {
     let cart = await Cart.findOne({ userId: userId });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-    const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${item.productId}`);
+    const productResponse = await axios.get(`${process.env.ProductService_BaseURL}/api/products/get-product/${item.productId}`);
 
     if (productResponse.data.success === false) {
         return res.status(404).json({ message: "Product not found" });
@@ -52,9 +41,7 @@ export const addToCart = async (req, res) => {
 export const createNewCart = async (req, res) => {
     try {
         const userId = req.params.userId;
-        console.log('AuthPort =', AuthPort);
-        const response = await axios.get(`http://localhost:${AuthPort}/api/auth/${userId}`);
-        console.log(AuthPort)
+        const response = await axios.get(`${process.env.AuthenticationService_BaseURL}/api/auth/${userId}`);
         if(response.data.success === false){
             return res.status(404).json({ message: "User not found" });
         }
@@ -89,7 +76,7 @@ export const removeItemFromCart = async (req, res) => {
         const cart = await Cart.findOne({ userId: userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
         
-        const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${itemId}`);
+        const productResponse = await axios.get(`${process.env.ProductService_BaseURL}/api/products/get-product/${itemId}`);
         if (productResponse.data.success === false) {
             return res.status(404).json({ message: "Product not found" });
         }
@@ -115,7 +102,7 @@ export const reduceItemQuantityInCart = async (req, res) => {
         const { userId, itemId } = req.params;
         const { quantity } = req.body;
 
-        const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${itemId}`);
+        const productResponse = await axios.get(`${process.env.ProductService_BaseURL}/api/products/get-product/${itemId}`);
         if (productResponse.data.success === false) {
             return res.status(404).json({ message: "Product not found" });
         }

@@ -35,7 +35,7 @@ const AdminOrderPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/api/payment/orders", { withCredentials: true });
+        const res = await axios.get(`${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/orders`, { withCredentials: true });
         const ordersData = res.data.orders || res.data || [];
 
         const enrichedOrders = await Promise.all(
@@ -43,7 +43,7 @@ const AdminOrderPage = () => {
             // Fetch user
             let user = { user: { username: "Unknown", email: "Unknown" } };
             try {
-              const userRes = await axios.get(`http://localhost:5000/api/auth/${order.userId}`);
+              const userRes = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/${order.userId}`);
               user = userRes.data || user;
             } catch (err) {
               console.warn(`Failed to fetch user ${order.userId}:`, err);
@@ -55,7 +55,7 @@ const AdminOrderPage = () => {
                 let product = { product: { name: "Product", price: 0 } };
                 try {
                   const productRes = await axios.get(
-                    `http://localhost:5002/api/products/get-product/${item.productId}`
+                    `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/get-product/${item.productId}`
                   );
                   product = productRes.data || product;
                 } catch (err) {
@@ -84,7 +84,7 @@ const AdminOrderPage = () => {
     setUpdating(orderId);
     try {
       await axios.put(
-        `http://localhost:5001/api/payment/update/${orderId}`,
+        `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/update/${orderId}`,
         { status: newStatus },
         { withCredentials: true }
       );

@@ -1,24 +1,21 @@
 import nodemailer from "nodemailer";
-
 import dotenvFlow from "dotenv-flow";
-import { loadEnv } from "../../config/loadEnv.js";
-import { fileURLToPath, pathToFileURL } from "url";
-import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const envFileURL = pathToFileURL(path.join(__dirname, "../.env")).href;
-
-loadEnv(envFileURL, dotenvFlow);
+dotenvFlow.config();
 
 const GmailUser = process.env.GMAIL_USER
 const GmailPass = process.env.GMAIL_PASS
 
+const BrevoUser = process.env.BREVO_SMTP_USER
+const BrevoPass = process.env.BREVO_SMTP_PASS
+
 export const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
-        user: GmailUser,
-        pass: GmailPass
+        user: BrevoUser,
+        pass: BrevoPass
     }
 });
 
