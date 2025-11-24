@@ -17,11 +17,9 @@ const ShopPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchProducts = async (category, query) => {
-    console.log(import.meta.env.VITE_PRODUCT_SERVICE_URL);
-    console.log(import.meta.env.VITE_PAYMENT_SERVICE_URL);
-    console.log(import.meta.env.VITE_AUTH_SERVICE_URL);
     setLoading(true);
     try {
       let endpoint = `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/all-products`;
@@ -46,22 +44,38 @@ const ShopPage = () => {
     }
   };
 
-  // fetch when search query or category changes
   useEffect(() => {
     fetchProducts(selectedCategory, searchQuery);
   }, [selectedCategory, searchQuery]);
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
+    setSidebarOpen(false); // close sidebar on mobile after selection
   };
 
   return (
-    <div className="flex min-h-screen min-w-250 max-w-250 bg-[#fffbff] p-6">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#fffbff] p-4 md:p-6">
+      {/* Mobile toggle button */}
+      <div className="md:hidden mb-4">
+        <button
+          className="px-4 py-2 bg-[#ebd8d0] rounded-xl shadow-md"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          {sidebarOpen ? "Close Categories" : "Open Categories"}
+        </button>
+      </div>
+
       {/* Sidebar */}
-      <aside className="w-64 bg-[#ebd8d0] rounded-xl p-4 mr-6 shadow-md">
+      <aside
+        className={`${
+          sidebarOpen ? "block" : "hidden"
+        } md:block w-full md:w-64 bg-[#ebd8d0] rounded-xl p-4 mb-4 md:mb-0 md:mr-6 shadow-md`}
+      >
         <SearchBar query={searchQuery} setQuery={setSearchQuery} />
 
-        <h2 className="text-xl font-bold text-[#BD8F80] mb-4">Categories</h2>
+        <h2 className="text-xl font-bold text-[#BD8F80] mb-4 mt-4 md:mt-0">
+          Categories
+        </h2>
         <ul className="space-y-2">
           {categories.map((category, idx) => (
             <li
@@ -79,7 +93,7 @@ const ShopPage = () => {
 
       {/* Products */}
       <section className="flex-1">
-        <h1 className="text-3xl font-bold text-[#BD8F80] mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#BD8F80] mb-6">
           Shop Handicrafts
         </h1>
 

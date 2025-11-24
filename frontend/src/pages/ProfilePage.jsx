@@ -1,4 +1,3 @@
-// src/pages/ProfilePage.jsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -18,7 +17,6 @@ const ProfilePage = () => {
   });
 
   useEffect(() => {
-    // fetch current user info
     axios
       .get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { withCredentials: true })
       .then((res) => {
@@ -62,13 +60,13 @@ const ProfilePage = () => {
   if (!user) return <p className="p-6 text-[#916556]">Loading profile...</p>;
 
   return (
-    <div className="min-h-screen bg-[#fffbff] min-w-[700px]">
-      <div className="w-full max-w-7xl mx-auto px-6 py-6">
-        <h1 className="text-3xl font-bold text-[#BD8F80] mb-6">My Profile</h1>
+    <div className="min-h-screen bg-[#fffbff]">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 py-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#BD8F80] mb-6">My Profile</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
           {/* Profile Image */}
-          <div className="shrink">
+          <div className="flex-shrink-0 w-full md:w-40 flex flex-col items-center md:items-start">
             <img
               src={formData.profileImage || "https://placehold.co/150x150?text=?"}
               alt="Profile"
@@ -93,7 +91,6 @@ const ProfilePage = () => {
               <div>
                 <h2 className="text-xl font-bold text-[#BD8F80] mb-3">Basic Information</h2>
 
-                {/* Username */}
                 <div className="mb-4">
                   <label className="block text-[#916556] font-medium mb-1">Username</label>
                   {editMode ? (
@@ -109,7 +106,6 @@ const ProfilePage = () => {
                   )}
                 </div>
 
-                {/* Email */}
                 <div className="mb-4">
                   <label className="block text-[#916556] font-medium mb-1">Email</label>
                   {editMode ? (
@@ -130,7 +126,6 @@ const ProfilePage = () => {
               <div>
                 <h2 className="text-xl font-bold text-[#BD8F80] mb-3">Address</h2>
 
-                {/* Street */}
                 <div className="mb-4">
                   <label className="block text-[#916556] font-medium mb-1">Street</label>
                   {editMode ? (
@@ -146,8 +141,7 @@ const ProfilePage = () => {
                   )}
                 </div>
 
-                {/* City + State */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-[#916556] font-medium mb-1">City</label>
                     {editMode ? (
@@ -179,8 +173,7 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* Postal + Country */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-[#916556] font-medium mb-1">Postal Code</label>
                     {editMode ? (
@@ -211,12 +204,11 @@ const ProfilePage = () => {
                     )}
                   </div>
                 </div>
-
               </div>
 
               {/* BUTTONS */}
               {editMode && (
-                <div className="flex gap-4 mt-6">
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
                   <button
                     type="submit"
                     className="bg-[#d3ab9e] text-white px-4 py-2 rounded-xl hover:bg-[#BD8F80] transition"
@@ -234,17 +226,15 @@ const ProfilePage = () => {
                 </div>
               )}
 
-                {/* Edit Profile button outside the form */}
-                {!editMode && (
+              {!editMode && (
                 <button
-                    type="button"
-                    onClick={() => setEditMode(true)}
-                    className="mb-4 bg-[#d3ab9e] text-white px-4 py-2 rounded-xl hover:bg-[#BD8F80] transition"
+                  type="button"
+                  onClick={() => setEditMode(true)}
+                  className="mt-4 sm:mt-0 bg-[#d3ab9e] text-white px-4 py-2 rounded-xl hover:bg-[#BD8F80] transition"
                 >
-                    Edit Profile
+                  Edit Profile
                 </button>
-                )}
-
+              )}
             </form>
           </div>
         </div>
