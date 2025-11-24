@@ -32,7 +32,7 @@ const ResetPasswordPage = () => {
       const res = await axios.post(
         `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/reset-password/${token}`,
         { password },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
       if (res.data.success) {

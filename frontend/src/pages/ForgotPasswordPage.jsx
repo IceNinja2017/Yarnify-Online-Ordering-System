@@ -21,7 +21,7 @@ const ForgotPasswordPage = () => {
       const res = await axios.post(
         `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/forgot-password`,
         { email },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
       if (res.data.success) {

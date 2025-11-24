@@ -45,9 +45,7 @@ const RegistrationPage = () => {
         };
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/register`, data, {
-                withCredentials: true
-            });
+            const response = await axios.post(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/register`, data, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
             console.log("Registration success:", response.data);
             localStorage.setItem("token", response.data.token);
             navigate("/verify-email");

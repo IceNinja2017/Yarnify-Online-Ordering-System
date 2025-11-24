@@ -45,7 +45,7 @@ const EmailVerificationPage = () => {
             const response = await axios.post(
                 `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/verify-email`,
                 { code: verificationCode },
-                { withCredentials: true }
+                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
 
             toast.success(response.data?.message || "Email verified successfully!");

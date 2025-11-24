@@ -21,7 +21,9 @@ const PaymentCanceledPage = () => {
     axios.post(
       `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/cancel-paypal-order`,
       { paypalOrderId },
-      { withCredentials: true }
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      }
     )
       .then((res) => {
         setStatus("Payment canceled. Your order has been marked as canceled.");

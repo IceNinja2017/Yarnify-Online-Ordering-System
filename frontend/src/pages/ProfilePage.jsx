@@ -20,7 +20,9 @@ const ProfilePage = () => {
   useEffect(() => {
     // fetch current user info
     axios
-      .get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { withCredentials: true })
+      .get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          })
       .then((res) => {
         const userData = res.data.user;
         setUser(userData);
@@ -49,7 +51,9 @@ const ProfilePage = () => {
       const res = await axios.patch(
         `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/update-profile`,
         formData,
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        }
       );
       setUser(res.data.user);
       setEditMode(false);

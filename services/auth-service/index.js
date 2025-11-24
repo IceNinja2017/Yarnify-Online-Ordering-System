@@ -17,7 +17,6 @@ app.listen(PORT, () =>{
     console.log(SERVICE_NAME + " Server started at http://localhost:" + PORT);
 });
 
-app.set("trust proxy", 1);
 app.use(cors({
     origin: process.env.FRONTEND_BASE_URL,
     credentials: true,

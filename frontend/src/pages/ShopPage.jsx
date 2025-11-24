@@ -36,7 +36,7 @@ const ShopPage = () => {
         )}`;
       }
 
-      const res = await axios.get(endpoint);
+      const res = await axios.get(endpoint, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
       setProducts(res.data.products || res.data);
     } catch (err) {
       console.error(err);

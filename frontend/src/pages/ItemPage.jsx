@@ -15,9 +15,7 @@ export default function ItemPage() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
-                    withCredentials: true,
-                });
+                const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
                 setUserId(res.data.user._id);
             } catch (err) {
                 console.error("Not logged in or failed to fetch user");

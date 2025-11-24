@@ -16,9 +16,7 @@ const OrdersPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
         setUser(res.data.user);
       } catch (err) {
         console.error("Error fetching user:", err);
@@ -34,7 +32,8 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/orders/${user._id}`
+          `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/orders/${user._id}`,
+          { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
         );
         const allOrders = res.data; // this should be an array of orders from your backend
 

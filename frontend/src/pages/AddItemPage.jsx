@@ -53,7 +53,7 @@ const AddItemPage = () => {
       await axios.post(
         `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/product`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
+        { headers: { "Content-Type": "multipart/form-data" }, Authorization: `Bearer ${localStorage.getItem("token")}` }
       );
 
       toast.success("Product added successfully!");

@@ -41,7 +41,7 @@ const UpdateModal = ({ item, onClose, refreshInventory }) => {
       const res = await axios.put(
         `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/product/${item._id}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" }, Authorization: `Bearer ${localStorage.getItem("token")}` }
       );
 
       if (res.data.success) {

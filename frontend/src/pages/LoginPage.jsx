@@ -23,12 +23,10 @@ const LoginPage = () => {
         console.log(JSON.stringify(data))
 
         try {
-            const response = await axios.post(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/login`, data, {
-                withCredentials: true
-            });
+            const response = await axios.post(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/login`, data, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
             console.log("Login success:", response.data);
             setIsLoggedIn(true);
-            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("token", response.data.token)
             fetchMe();
             navigate("/shop");
         } catch (error) {

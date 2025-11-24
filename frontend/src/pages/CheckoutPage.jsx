@@ -15,9 +15,11 @@ const CheckoutPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, 
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          }
+        );
         setUser(res.data.user);
       } catch (err) {
         toast.error("Please login to continue");
@@ -43,7 +45,8 @@ const CheckoutPage = () => {
           items.map(async (item) => {
             try {
               const prodRes = await axios.get(
-                `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/get-product/${item.productId}`
+                `${import.meta.env.VITE_PRODUCT_SERVICE_URL}/api/products/get-product/${item.productId}`,
+                { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
               );
               return {
                 ...item,
@@ -83,7 +86,9 @@ const CheckoutPage = () => {
         await axios.post(
           `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/cod`,
           { userId: user._id },
-          { withCredentials: true }
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          }
         );
         toast.success("Order placed with Cash on Delivery!");
         navigate("/orders")
@@ -92,7 +97,9 @@ const CheckoutPage = () => {
         const res = await axios.post(
           `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/paypal`,
           { userId: user._id },
-          { withCredentials: true }
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          }
         );
         // Redirect user to PayPal approval link
         console.log("Paypal: ", res.data)

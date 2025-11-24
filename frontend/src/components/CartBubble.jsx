@@ -69,7 +69,7 @@ const CartBubble = ({ onClose, userId }) => {
       await axios.put(
         `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/update-item-quantity/${userId}/${productId}`,
         { quantity: newQuantity },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
       setCartItems((prev) =>

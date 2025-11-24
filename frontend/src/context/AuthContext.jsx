@@ -8,39 +8,40 @@ export const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState();
+  const [profileImage, setProfileImage] = useState("");
 
-  // fetchMe function: call this to refresh auth state
   const fetchMe = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, { withCredentials: true });
-      setIsLoggedIn(res.data.loggedIn);
-      setProfileImage(res.data.user.profileImage.url);
-      if (res.data.loggedIn && res.data.user) {
-        setUserId(res.data.user._id);
-        setUserRole(res.data.user.role);
-      } else {
-        setUserId(null);
-        setUserRole(null);
-        setProfileImage("");
-      }
+      const res = await axios.get(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+
+      const user = res.data.user || null;
+
+      setIsLoggedIn(!!res.data.loggedIn && !!user);
+      setUserId(user?._id || null);
+      setUserRole(user?.role || null);
+      setProfileImage(user?.profileImage?.url || "");
     } catch (err) {
       setIsLoggedIn(false);
       setUserId(null);
       setUserRole(null);
       setProfileImage("");
+      console.error("Error fetching user:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // call it on mount
   useEffect(() => {
     fetchMe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userId, userRole, loading, fetchMe, profileImage }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, setIsLoggedIn, userId, userRole, loading, fetchMe, profileImage }}
+    >
       {children}
     </AuthContext.Provider>
   );

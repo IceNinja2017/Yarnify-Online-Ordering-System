@@ -12,7 +12,6 @@ const app = express();
 const PORT = process.env.PaymentService_PORT;
 const SERVICE_NAME = process.env.SERVICE_NAME;
 
-app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(cors({
     origin: process.env.FRONTEND_BASE_URL,

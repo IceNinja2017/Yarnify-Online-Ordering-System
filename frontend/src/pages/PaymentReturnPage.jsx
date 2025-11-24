@@ -22,7 +22,9 @@ const PaymentReturnPage = () => {
       .post(
         `${import.meta.env.VITE_PAYMENT_SERVICE_URL}/api/payment/capture-paypal-order`,
         { orderId, payerId },
-        { withCredentials: true }
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        }
       )
       .then((response) => {
         console.log("Payment capture response:", response.data);
