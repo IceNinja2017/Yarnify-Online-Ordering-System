@@ -1,8 +1,7 @@
-import e from "express";
 import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE, WELCOME_EMAIL_TEMPLATE } from "./emailTemplates.js";
 import { transporter, sender } from "./gmail.config.js";
 
-export const sendVerificationEmain = async (email, verificationToken) => {
+export const sendVerificationEmail = async (email, verificationToken) => {
     try {
         const info = await transporter.sendMail({
             from: sender,
