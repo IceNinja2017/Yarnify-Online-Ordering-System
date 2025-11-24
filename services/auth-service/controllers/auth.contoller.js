@@ -11,23 +11,23 @@ dotenvFlow.config();
 
 export const register = async (req, res) => {
     try {
-        const { username, email, password, address} = req.body;
+        const { username, email, password, address } = req.body;
 
         // required field checks
         if (!username || !email || !password) {
             return res.status(400).json({ message: "username, email and password are required" });
         }
 
-        // Address is an object with required street, city, country
         if (!address || typeof address !== "object") {
             return res.status(400).json({ message: "address is required and must be an object" });
         }
+
         const { street, city, country } = address;
         if (!street || !city || !country) {
             return res.status(400).json({ message: "address.street, address.city, and address.country are required" });
         }
 
-        // Check duplicates (email or username)
+        // Check duplicates
         const existing = await User.findOne({
             $or: [{ email: email.toLowerCase() }, { username }]
         });
@@ -41,20 +41,29 @@ export const register = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create verification token (for email verification flow)
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString(); //crypto.randomBytes(32).toString("hex");
-        const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+        // Create verification token
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+        // **Send verification email first**
+        try {
+            await sendVerificationEmail(email.toLowerCase(), verificationToken);
+        } catch (emailErr) {
+            console.error("Email send failed:", emailErr);
+            return res.status(500).json({ message: "Failed to send verification email" });
+        }
+
+        // Only create and save user after email succeeds
         const newUser = new User({
             username,
             email: email.toLowerCase(),
             password: hashedPassword,
             address: {
-                street: address.street,
-                city: address.city,
+                street,
+                city,
                 state: address.state || null,
                 postalCode: address.postalCode || null,
-                country: address.country
+                country
             },
             verificationToken,
             verificationTokenExpiresAt
@@ -62,14 +71,10 @@ export const register = async (req, res) => {
 
         await newUser.save();
 
-        //jwt token
+        // JWT token
         generateTokenAndSetCookie(res, newUser._id);
-        await sendVerificationEmain(newUser.email, newUser.verificationToken);
 
-        // TODO: send verification email. Replace with your mailer.
-        // sendVerificationEmail(newUser.email, verificationToken);
-
-        // Sanitize response (remove sensitive fields)
+        // Sanitize response
         const userObj = newUser.toObject();
         delete userObj.password;
         delete userObj.verificationToken;
@@ -78,12 +83,12 @@ export const register = async (req, res) => {
         delete userObj.resetPasswordExpiresAt;
 
         return res.status(201).json({
-            sucess: true,
+            success: true,
             message: "Registration successful. Check your email to verify your account.",
             user: userObj
         });
+
     } catch (err) {
-        // handle duplicate key error that slipped through (extra safety)
         if (err?.code === 11000) {
             const dupKey = Object.keys(err.keyPattern || {}).join(", ");
             return res.status(409).json({ message: `Duplicate key: ${dupKey}` });
