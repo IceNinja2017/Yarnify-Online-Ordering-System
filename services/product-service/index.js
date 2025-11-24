@@ -18,6 +18,7 @@ const SERVICE_NAME = process.env.SERVICE_NAME;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.set("trust proxy", 1);
 
 app.use(cors({
     origin: process.env.FRONTEND_BASE_URL,
