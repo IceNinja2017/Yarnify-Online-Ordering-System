@@ -22,7 +22,7 @@ export const addToCart = async (req, res) => {
     let cart = await Cart.findOne({ userId: userId });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-    const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${item.productId}`);
+    const productResponse = await axios.get(`${process.env.ProductService_BaseURL}/api/products/get-product/${item.productId}`);
 
     if (productResponse.data.success === false) {
         return res.status(404).json({ message: "Product not found" });
@@ -53,7 +53,7 @@ export const createNewCart = async (req, res) => {
     try {
         const userId = req.params.userId;
         console.log('AuthPort =', AuthPort);
-        const response = await axios.get(`http://localhost:${AuthPort}/api/auth/${userId}`);
+        const response = await axios.get(`${process.env.AuthenticationService_BaseURL}/api/auth/${userId}`);
         console.log(AuthPort)
         if(response.data.success === false){
             return res.status(404).json({ message: "User not found" });
@@ -89,7 +89,7 @@ export const removeItemFromCart = async (req, res) => {
         const cart = await Cart.findOne({ userId: userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
         
-        const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${itemId}`);
+        const productResponse = await axios.get(`${process.env.ProductService_BaseURL}/api/products/get-product/${itemId}`);
         if (productResponse.data.success === false) {
             return res.status(404).json({ message: "Product not found" });
         }
@@ -115,7 +115,7 @@ export const reduceItemQuantityInCart = async (req, res) => {
         const { userId, itemId } = req.params;
         const { quantity } = req.body;
 
-        const productResponse = await axios.get(`http://localhost:${ProductPort}/api/products/get-product/${itemId}`);
+        const productResponse = await axios.get(`${process.env.ProductService_BaseURL}/api/products/get-product/${itemId}`);
         if (productResponse.data.success === false) {
             return res.status(404).json({ message: "Product not found" });
         }

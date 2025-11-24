@@ -174,11 +174,11 @@ export const verifyEmail = async (req, res) => {
 
         await user.save();
 
-
-        const PaymentService_PORT = process.env.PaymentService_PORT || 6000;
+        
+        const PaymentService_BaseURL = process.env.PaymentService_BaseURL || "http://localhost";
         // Communicate with Payment service to create a cart for the new user
         try {
-            const paymentRes = await axios.post(`http://localhost:${PaymentService_PORT}/api/payment/create-new-cart/${user._id}`);
+            const paymentRes = await axios.post(`${PaymentService_BaseURL}/api/payment/create-new-cart/${user._id}`);
             console.log(`Payment service responded with status: ${paymentRes.status}`);
         } catch (error) {
             console.error("Error communicating with Payment service:", err.message);
