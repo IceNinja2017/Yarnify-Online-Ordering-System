@@ -6,17 +6,16 @@ dotenvFlow.config();
 const GmailUser = process.env.GMAIL_USER
 const GmailPass = process.env.GMAIL_PASS
 
+const BrevoUser = process.env.BREVO_SMTP_USER
+const BrevoPass = process.env.BREVO_SMTP_PASS
+
 export const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: process.env.NODE_ENV === "production",
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
-        user: GmailUser,
-        pass: GmailPass
-    },
-    tls: {
-        rejectUnauthorized: !(process.env.NODE_ENV === "production")
+        user: BrevoUser,
+        pass: BrevoPass
     }
 });
 
