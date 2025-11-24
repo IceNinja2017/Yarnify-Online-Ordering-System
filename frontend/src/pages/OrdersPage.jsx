@@ -96,7 +96,7 @@ const OrdersPage = () => {
                   <td className="px-4 py-2">{order.paymentMethod}</td>
                   <td
                     className={`px-4 py-2 font-semibold ${
-                      order.paymentStatus === "Unpaid"
+                      order.paymentStatus === "Unpaid " || order.paymentStatus === "Canceled" 
                         ? "text-red-500"
                         : order.paymentStatus === "Paid"
                         ? "text-green-500"
